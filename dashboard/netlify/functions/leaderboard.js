@@ -31,21 +31,34 @@ function submissionUrl(username, day) {
   return `https://raw.githubusercontent.com/${username}/${GITHUB_REPO}/${BRANCH}/submissions/day${day}.json`;
 }
 
-function achievementScore(sub) {
-  if (!sub) return 0;
-  if (typeof sub.score === 'number') return sub.score;
-  const map = { diamond: 3, gold: 2, silver: 1 };
-  if (sub.achievement) return map[sub.achievement] ?? 0.5;
-  if (sub.student_name && sub.student_name.trim().length > 2) return 0.5;
-  return 0;
+const POINTS = { diamond: 3, gold: 2, silver: 1, submitted: 0.5 };
+
+function hasName(sub) {
+  return !!(sub && sub.student_name && sub.student_name.trim().length > 2);
 }
 
-function achievementLabel(sub) {
+// Completion-based badge rule, same for every day (see Training_Context_Continuity.md Section 3b/3c):
+// Silver = submitted, Gold = tasks_completed/tasks_total >= 80%, Diamond = 100% + stretch_done.
+// Each day's lab defines its own tasks_completed/tasks_total in the submission JSON.
+function defaultRule(sub) {
+  if (!hasName(sub)) return null;
+  const total = Number(sub.tasks_total);
+  const done = Number(sub.tasks_completed);
+  if (!total || !Number.isFinite(done)) return 'submitted';
+  const pct = done / total;
+  if (pct >= 1 && sub.stretch_done === true) return 'diamond';
+  if (pct >= 0.8) return 'gold';
+  return 'submitted';
+}
+
+function achievementLabel(day, sub) {
   if (!sub) return null;
-  if (sub.achievement) return sub.achievement; // diamond / gold / silver
-  const score = achievementScore(sub);
-  if (score > 0) return 'submitted';
-  return null;
+  return defaultRule(sub);
+}
+
+function achievementScore(day, sub) {
+  const label = achievementLabel(day, sub);
+  return label ? POINTS[label] ?? 0 : 0;
 }
 
 exports.handler = async (event) => {
@@ -69,8 +82,8 @@ exports.handler = async (event) => {
           const sub = await fetchJSON(submissionUrl(s.github, day));
           return {
             day,
-            achievement: achievementLabel(sub),
-            score: achievementScore(sub),
+            achievement: achievementLabel(day, sub),
+            score: achievementScore(day, sub),
           };
         })
       );

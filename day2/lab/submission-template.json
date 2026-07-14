@@ -1,0 +1,23 @@
+{
+  "day": 2,
+  "student_name": "Your Full Name",
+  "github": "your-github-username",
+
+  "lab1_scenario": "A",
+  "lab1_prompt": "Your full assembled 6-element prompt from Lab 1",
+  "lab1_output_met_constraints": true,
+  "lab1_extra_scenarios_done": 0,
+
+  "lab2_problem": "Galaxy Buds distribution centre — shipment/hold/restock",
+  "lab2_naive_output_summary": "What the naive prompt's answer was and whether it showed its reasoning",
+  "lab2_cot_prompt": "Your own Chain-of-Thought version of the prompt",
+  "lab2_cot_output_summary": "What the Chain-of-Thought answer was and whether the steps looked correct",
+  "better_approach": "cot",
+
+  "stretch_done": false,
+  "stretch_react_prompt": "",
+
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": ""
+}

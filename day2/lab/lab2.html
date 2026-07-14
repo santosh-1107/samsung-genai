@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 — Lab 2: Reasoning Upgrade | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0F2E; color: #F8FAFF; font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+#prog { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #00D4AA, #1428A0); z-index: 999; width: 0%; transition: width 0.4s; }
+
+header {
+  background: #0D1335; border-bottom: 1px solid #1E2A5E;
+  padding: 14px 32px; display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+}
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #00D4AA; }
+.day-badge { background: #1428A0; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.lab-badge { background: rgba(0,212,170,0.15); color: #00D4AA; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0,212,170,0.25); }
+
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.subtitle { color: #7A8FA6; font-size: 14px; margin-bottom: 28px; }
+
+.card {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  padding: 22px 24px; margin-bottom: 20px;
+}
+.card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.card p, .card li { font-size: 13.5px; color: #A0B0C8; line-height: 1.7; }
+
+/* Prompt cards */
+.prompt-card {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.prompt-header {
+  padding: 18px 24px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; user-select: none;
+}
+.prompt-num {
+  width: 36px; height: 36px; border-radius: 10px; background: #1428A0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.prompt-card.cot .prompt-num { background: #7C3AED; }
+.prompt-title-wrap { flex: 1; }
+.prompt-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+.prompt-tag { font-size: 11px; color: #7A8FA6; margin-top: 2px; }
+.prompt-card.cot .prompt-tag { color: #A78BFA; }
+.chevron { color: #7A8FA6; font-size: 18px; transition: transform 0.3s; }
+.prompt-card.open .chevron { transform: rotate(180deg); }
+.prompt-body { display: none; padding: 0 24px 24px; }
+.prompt-card.open .prompt-body { display: block; }
+
+.prompt-text-box {
+  background: #0D1B3E; border: 1px solid #1E3070; border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 16px; position: relative;
+}
+.prompt-text-label { font-size: 10px; font-weight: 600; color: #3A6BC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.prompt-text { font-size: 14px; line-height: 1.75; color: #C8D8F0; white-space: pre-wrap; }
+.copy-btn {
+  position: absolute; top: 12px; right: 12px;
+  background: #1428A0; color: #fff; border: none; padding: 5px 12px;
+  border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.copy-btn:hover { background: #1a35c9; }
+.copy-btn.copied { background: #00A882; }
+
+.link-btn {
+  display: inline-block; padding: 8px 16px; border-radius: 8px; text-decoration: none;
+  font-size: 12px; font-weight: 600; margin-right: 8px; margin-bottom: 10px; color: #fff; background: #1428A0;
+  transition: opacity 0.2s;
+}
+.link-btn:hover { opacity: .85; }
+
+.field-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00D4AA; margin: 12px 0 6px; display: block; }
+textarea, input[type=text] {
+  width: 100%; background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 10px 12px; color: #F8FAFF; font-size: 13px; font-family: 'Inter', sans-serif; resize: vertical;
+}
+textarea:focus, input[type=text]:focus { outline: none; border-color: #00D4AA; }
+
+.radio-row { display: flex; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+.radio-row label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #A0B0C8; cursor: pointer; }
+.radio-row input { accent-color: #00D4AA; }
+
+.info-box {
+  background: #0D1B3E; border-left: 3px solid #1428A0; border-radius: 0 8px 8px 0;
+  padding: 12px 16px; margin: 10px 0 14px; font-size: 13px; color: #A0B0C8; line-height: 1.7;
+}
+.info-box strong { color: #F8FAFF; }
+code { font-family: 'IBM Plex Mono', monospace; background: #1E2A5E; padding: 2px 7px; border-radius: 4px; font-size: 12px; color: #00D4AA; }
+
+/* Generator section */
+.gen-section { background: #0D1335; border: 1px solid #1E2A5E; border-radius: 14px; padding: 24px 26px; margin-top: 30px; }
+.gen-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 6px; }
+.gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+@media (max-width: 760px) { .gen-grid { grid-template-columns: 1fr; } }
+.gen-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #7A8FA6; margin-bottom: 5px; }
+.tasks-note { font-size: 12px; color: #7A8FA6; margin-top: 4px; }
+.json-preview {
+  background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 16px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7EE8C8; white-space: pre-wrap;
+  line-height: 1.7; max-height: 320px; overflow-y: auto; margin: 14px 0;
+}
+.gen-btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.gen-btn {
+  padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: .2s;
+}
+.gen-btn.primary { background: #00D4AA; color: #0A0F2E; }
+.gen-btn.primary:hover { background: #00F0C0; }
+.gen-btn.ghost { background: transparent; color: #00D4AA; border: 1px solid rgba(0,212,170,0.4); }
+.gen-btn.ghost:hover { background: rgba(0,212,170,0.1); }
+.gen-btn.copied { background: #00A882 !important; color: #fff !important; }
+
+.save-checklist { background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+.save-row { font-size: 13px; color: #A0B0C8; margin-bottom: 8px; display: flex; gap: 8px; align-items: flex-start; }
+.cmd-block {
+  background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00D4AA; line-height: 2; margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<div id="prog" style="width:0%"></div>
+
+<header>
+  <div class="logo">⚡ Samsung GenAI</div>
+  <div class="day-badge">DAY 2</div>
+  <div class="lab-badge">Lab 2 — Reasoning Upgrade</div>
+  <div style="margin-left:auto; font-size:12px; color:#7A8FA6;">Individual · Scored · PM</div>
+</header>
+
+<div class="container">
+  <h1>Reasoning Upgrade Lab</h1>
+  <p class="subtitle">Same problem, two prompting strategies. See exactly what structured reasoning buys you.</p>
+
+  <div class="card">
+    <h3>The problem — same for everyone</h3>
+    <p style="color:#C8D8F0; font-size:14.5px; line-height:1.8">Samsung's SRM-area distribution centre starts the day with <strong>4,200 Galaxy Buds units</strong>. A morning shipment sends out <strong>850 units</strong>, split equally across 3 retail partners. After that shipment, a quality hold is placed on <strong>6% of the remaining stock</strong>, pending inspection. An afternoon restock then adds <strong>1,150 new units</strong>, which are not subject to the hold. <strong>How many units are available for sale (i.e. not on hold) by end of day?</strong></p>
+  </div>
+
+  <!-- Prompt 1: Naive -->
+  <div class="prompt-card open" id="pcard-naive">
+    <div class="prompt-header" onclick="togglePrompt('pcard-naive')">
+      <div class="prompt-num">1</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Naive Prompt — copy exactly, don't edit it</div>
+        <div class="prompt-tag">Run this first, in any one AI tool</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Copy this exactly</div>
+        <div class="prompt-text" id="naive-prompt-text">How many Galaxy Buds units are available for sale by end of day given: starts at 4200, sends out 850, holds 6% of remaining stock, restocks 1150?</div>
+        <button class="copy-btn" onclick="copyPrompt('naive-prompt-text', this)">Copy</button>
+      </div>
+      <a href="https://chat.openai.com" target="_blank" class="link-btn">ChatGPT ↗</a>
+      <a href="https://claude.ai" target="_blank" class="link-btn">Claude ↗</a>
+      <a href="https://gemini.google.com" target="_blank" class="link-btn">Gemini ↗</a>
+      <label class="field-label">Summarize the AI's answer and its reasoning (1–2 sentences)</label>
+      <textarea id="naive-summary" rows="3" placeholder="What number did it give, and did it show its working?"></textarea>
+    </div>
+  </div>
+
+  <!-- Prompt 2: CoT -->
+  <div class="prompt-card cot" id="pcard-cot">
+    <div class="prompt-header" onclick="togglePrompt('pcard-cot')">
+      <div class="prompt-num">2</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Chain-of-Thought Prompt — you write this one</div>
+        <div class="prompt-tag">Use Section 6's pattern from today's content page</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="info-box">Rewrite the same problem, but explicitly instruct the model to reason step by step before giving a final number — e.g. add a line like <em>"Work through this one step at a time: first compute the shipment, then the hold, then the restock. Show each step, then state the final answer."</em> You can restate the numbers in your own words.</div>
+      <label class="field-label">Your Chain-of-Thought prompt</label>
+      <textarea id="cot-prompt" rows="4" placeholder="Write your step-by-step version of the prompt here"></textarea>
+      <a href="https://chat.openai.com" target="_blank" class="link-btn">ChatGPT ↗</a>
+      <a href="https://claude.ai" target="_blank" class="link-btn">Claude ↗</a>
+      <a href="https://gemini.google.com" target="_blank" class="link-btn">Gemini ↗</a>
+      <label class="field-label">Summarize the AI's step-by-step answer (1–2 sentences)</label>
+      <textarea id="cot-summary" rows="3" placeholder="What number did it give this time, and did the steps look correct?"></textarea>
+    </div>
+  </div>
+
+  <!-- Comparison -->
+  <div class="card">
+    <h3>Compare the two</h3>
+    <p>Which approach would you actually trust for a real inventory decision — and why?</p>
+    <div class="radio-row">
+      <label><input type="radio" name="better" value="naive" onchange="markField('better')"> Naive was just as good</label>
+      <label><input type="radio" name="better" value="cot" onchange="markField('better')"> Chain-of-Thought was more trustworthy</label>
+    </div>
+    <label class="field-label">Optional stretch — attempt a ReAct-style prompt</label>
+    <textarea id="stretch-prompt" rows="3" placeholder="Write a prompt that asks the model to call out where it would need a real tool/calculation instead of guessing — leave blank to skip"></textarea>
+  </div>
+
+  <!-- ═══════════ COMBINED SUBMISSION GENERATOR ═══════════ -->
+  <div class="gen-section">
+    <h3>Submit — one auto-generated file, covering Lab 1 + Lab 2</h3>
+    <p style="font-size:13.5px; color:#A0B0C8; margin-bottom:14px">Fill in the fields below (including your Lab 1 answers from this morning), then click <strong style="color:#00D4AA">Generate &amp; Download day2.json</strong>. Your browser saves the file already correctly named and typed — no Notepad editing needed.</p>
+
+    <div class="gen-grid">
+      <div class="gen-field"><label>Full Name</label><input type="text" id="g-name" oninput="renderJSON()" placeholder="Your Full Name"></div>
+      <div class="gen-field"><label>GitHub Username</label><input type="text" id="g-github" oninput="renderJSON()" placeholder="your-github-username"></div>
+    </div>
+
+    <div class="field-label" style="margin-top:8px">Lab 1 recap</div>
+    <div class="gen-grid">
+      <div class="gen-field">
+        <label>Scenario you chose (A / B / C)</label>
+        <select id="g-scenario" onchange="renderJSON()" style="width:100%;background:#070C1F;border:1px solid #1E2A5E;border-radius:8px;padding:10px 12px;color:#F8FAFF;font-size:13px">
+          <option value="">— select —</option>
+          <option value="A">A — Care+ Escalation Reply</option>
+          <option value="B">B — Competitor Brief</option>
+          <option value="C">C — New-Hire FAQ Bot Reply</option>
+        </select>
+      </div>
+      <div class="gen-field">
+        <label>Did the output meet your constraints?</label>
+        <select id="g-met" onchange="renderJSON()" style="width:100%;background:#070C1F;border:1px solid #1E2A5E;border-radius:8px;padding:10px 12px;color:#F8FAFF;font-size:13px">
+          <option value="false">No / partially</option>
+          <option value="true">Yes</option>
+        </select>
+      </div>
+    </div>
+    <label class="field-label">Your assembled 6-element prompt from Lab 1</label>
+    <textarea id="g-lab1prompt" rows="3" oninput="renderJSON()" placeholder="Paste your Lab 1 prompt here"></textarea>
+    <div class="gen-field" style="margin-top:10px">
+      <label>Extra scenarios completed as stretch (0–2)</label>
+      <input type="text" id="g-extra" oninput="renderJSON()" placeholder="0" style="max-width:120px">
+    </div>
+
+    <div class="field-label" style="margin-top:16px">Lab 2 recap</div>
+    <p class="tasks-note" id="g-tasks-note">0 / 6 core tasks detected as complete</p>
+    <div class="json-preview" id="json-preview">Fill in the fields above to build your submission JSON.</div>
+
+    <div class="gen-btn-row">
+      <button class="gen-btn primary" onclick="downloadJSON()">⬇ Generate &amp; Download day2.json</button>
+      <button class="gen-btn ghost" id="copy-json-btn" onclick="copyJSONToClipboard(this)">Copy JSON instead</button>
+    </div>
+
+    <div class="save-checklist">
+      <div class="save-row">📁 The download saves as <code>day2.json</code> in your <strong>Downloads</strong> folder.</div>
+      <div class="save-row">➡️ Move it into your <code>samsung-genai/submissions/</code> folder (drag-and-drop in File Explorer, or cut-paste).</div>
+      <div class="save-row">⚠️ Do not rename the file or change its extension — it must stay exactly <code>day2.json</code>.</div>
+    </div>
+
+    <div class="field-label">Push via Git Bash</div>
+    <div class="cmd-block">git add submissions/day2.json<br>git commit -m "Day 2 submission - YOUR NAME"<br>git push origin main</div>
+    <p style="font-size:12px; color:#7A8FA6; margin-top:8px">Right-click inside your <code>samsung-genai</code> folder → <strong>Git Bash Here</strong> → run the 3 commands above, one at a time. Replace YOUR NAME in the commit message.</p>
+  </div>
+</div>
+
+<script>
+function togglePrompt(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+function copyPrompt(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function markField(){ renderJSON(); }
+
+function buildSubmission() {
+  const name = document.getElementById('g-name').value.trim();
+  const github = document.getElementById('g-github').value.trim();
+  const scenario = document.getElementById('g-scenario').value;
+  const met = document.getElementById('g-met').value === 'true';
+  const lab1prompt = document.getElementById('g-lab1prompt').value.trim();
+  const extra = parseInt(document.getElementById('g-extra').value, 10) || 0;
+  const naiveSummary = document.getElementById('naive-summary').value.trim();
+  const cotPrompt = document.getElementById('cot-prompt').value.trim();
+  const cotSummary = document.getElementById('cot-summary').value.trim();
+  const betterEl = document.querySelector('input[name=better]:checked');
+  const better = betterEl ? betterEl.value : '';
+  const stretchPrompt = document.getElementById('stretch-prompt').value.trim();
+
+  const requiredDone = [
+    !!lab1prompt,
+    !!scenario,
+    !!naiveSummary,
+    !!cotPrompt,
+    !!cotSummary,
+    !!better,
+  ];
+  const tasksCompleted = requiredDone.filter(Boolean).length;
+  const tasksTotal = 6;
+
+  return {
+    day: 2,
+    student_name: name,
+    github: github,
+
+    lab1_scenario: scenario,
+    lab1_prompt: lab1prompt,
+    lab1_output_met_constraints: met,
+    lab1_extra_scenarios_done: extra,
+
+    lab2_problem: "Galaxy Buds distribution centre — shipment/hold/restock",
+    lab2_naive_output_summary: naiveSummary,
+    lab2_cot_prompt: cotPrompt,
+    lab2_cot_output_summary: cotSummary,
+    better_approach: better,
+
+    stretch_done: !!stretchPrompt,
+    stretch_react_prompt: stretchPrompt,
+
+    tasks_completed: tasksCompleted,
+    tasks_total: tasksTotal,
+    submitted_at: new Date().toISOString(),
+  };
+}
+
+function renderJSON() {
+  const sub = buildSubmission();
+  document.getElementById('g-tasks-note').textContent = `${sub.tasks_completed} / ${sub.tasks_total} core tasks detected as complete`;
+  document.getElementById('json-preview').textContent = JSON.stringify(sub, null, 2);
+}
+
+function downloadJSON() {
+  const sub = buildSubmission();
+  const blob = new Blob([JSON.stringify(sub, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'day2.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyJSONToClipboard(btn) {
+  const sub = buildSubmission();
+  navigator.clipboard.writeText(JSON.stringify(sub, null, 2)).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy JSON instead'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// Live-update JSON preview as any field changes
+['naive-summary','cot-prompt','cot-summary','stretch-prompt'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderJSON);
+});
+document.querySelectorAll('input[name=better]').forEach(r => r.addEventListener('change', renderJSON));
+
+renderJSON();
+</script>
+</body>
+</html>

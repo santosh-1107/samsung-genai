@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 2 — Lab 1: Prompt Framework Builder | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0F2E; color: #F8FAFF; font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+#prog { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #00D4AA, #1428A0); transition: width 0.4s; z-index: 999; }
+
+header {
+  background: #0D1335; border-bottom: 1px solid #1E2A5E;
+  padding: 14px 32px; display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+}
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #00D4AA; }
+.day-badge { background: #1428A0; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.lab-badge { background: #1E2A5E; color: #A0B0C8; font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; }
+
+.container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.subtitle { color: #7A8FA6; font-size: 14px; margin-bottom: 8px; }
+.unscored-note { display: inline-block; background: #1E2A5E; color: #A0B0C8; font-size: 12px; padding: 4px 14px; border-radius: 20px; margin-bottom: 36px; }
+
+.progress-box {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  padding: 22px 26px; margin-bottom: 28px; display: flex; align-items: center; gap: 24px;
+}
+.progress-circle {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: conic-gradient(#00D4AA 0deg, #1E2A5E 0deg);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  transition: background 0.4s;
+}
+.progress-circle::after {
+  content: ''; position: absolute; width: 54px; height: 54px;
+  background: #111830; border-radius: 50%;
+}
+.progress-inner { position: relative; z-index: 1; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 17px; color: #00D4AA; }
+.progress-text h3 { font-family: 'Space Grotesk', sans-serif; font-size: 18px; font-weight: 700; }
+.progress-text p { color: #7A8FA6; font-size: 13px; margin-top: 4px; }
+
+.step-card {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  padding: 22px 24px; margin-bottom: 12px; display: flex; gap: 18px;
+  align-items: flex-start; transition: border-color 0.3s, box-shadow 0.3s;
+}
+.step-card.done { border-color: #00D4AA; box-shadow: 0 0 0 1px rgba(0,212,170,0.12); }
+.step-num {
+  width: 38px; height: 38px; border-radius: 50%; background: #1E2A5E;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px;
+  flex-shrink: 0; color: #A0B0C8; transition: background 0.3s, color 0.3s;
+}
+.step-card.done .step-num { background: #00D4AA; color: #0A0F2E; }
+.step-content { flex: 1; min-width: 0; }
+.step-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; margin-bottom: 5px; }
+.step-desc { color: #A0B0C8; font-size: 13px; line-height: 1.7; margin-bottom: 12px; }
+
+.link-btn {
+  display: inline-block; padding: 8px 16px; border-radius: 8px; text-decoration: none;
+  font-size: 12px; font-weight: 600; margin-right: 8px; margin-bottom: 10px;
+  transition: opacity 0.2s;
+}
+.link-btn.blue { background: #1428A0; color: #fff; }
+.link-btn.blue:hover { opacity: 0.85; }
+.link-btn.teal { background: rgba(0,212,170,0.12); color: #00D4AA; border: 1px solid rgba(0,212,170,0.25); }
+.link-btn.teal:hover { background: rgba(0,212,170,0.22); }
+
+.info-box {
+  background: #0D1B3E; border-left: 3px solid #1428A0; border-radius: 0 8px 8px 0;
+  padding: 12px 16px; margin: 10px 0 14px; font-size: 13px; color: #A0B0C8; line-height: 1.7;
+}
+.info-box strong { color: #F8FAFF; }
+
+.code-block {
+  background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 14px 16px; margin: 10px 0 14px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px; color: #A0B0C8; line-height: 2;
+}
+.cmd { color: #00D4AA; }
+.cmt { color: #3A4F6E; }
+code { font-family: 'IBM Plex Mono', monospace; background: #1E2A5E; padding: 2px 7px; border-radius: 4px; font-size: 12px; color: #00D4AA; }
+
+.check-label {
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  font-size: 13px; color: #7A8FA6; user-select: none; transition: color 0.2s;
+}
+.check-label input[type="checkbox"] { width: 17px; height: 17px; accent-color: #00D4AA; cursor: pointer; flex-shrink: 0; }
+.check-label.checked { color: #00D4AA; font-weight: 500; }
+
+.scenario-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+@media (max-width: 760px) { .scenario-grid { grid-template-columns: 1fr; } }
+.scenario-card {
+  background: #0D1B3E; border: 2px solid #1E2A5E; border-radius: 10px; padding: 14px;
+  cursor: pointer; transition: .2s;
+}
+.scenario-card:hover { border-color: #1428A0; }
+.scenario-card.picked { border-color: #00D4AA; background: rgba(0,212,170,0.08); }
+.scenario-card h4 { font-family: 'Space Grotesk', sans-serif; font-size: 14px; margin-bottom: 6px; }
+.scenario-card p { font-size: 12px; color: #A0B0C8; line-height: 1.55; }
+
+.pb-field { margin-bottom: 12px; }
+.pb-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00D4AA; margin-bottom: 6px; }
+.pb-field textarea, .pb-field input {
+  width: 100%; background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 10px 12px; color: #F8FAFF; font-size: 13px; font-family: 'Inter', sans-serif; resize: vertical;
+}
+.pb-field textarea:focus, .pb-field input:focus { outline: none; border-color: #00D4AA; }
+.pb-preview {
+  background: #070C1F; border: 1px solid rgba(0,212,170,0.35); border-radius: 8px;
+  padding: 14px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00D4AA;
+  white-space: pre-wrap; line-height: 1.7; min-height: 60px; margin-top: 8px;
+}
+
+.done-banner {
+  background: linear-gradient(135deg, #00A882 0%, #1428A0 100%);
+  border-radius: 14px; padding: 32px; text-align: center;
+  margin-top: 24px; display: none;
+}
+.done-banner h2 { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.done-banner p { color: rgba(255,255,255,0.85); font-size: 14px; line-height: 1.6; }
+.next-btn {
+  display: inline-block; background: #fff; color: #1428A0;
+  padding: 10px 26px; border-radius: 8px; font-weight: 700; font-size: 14px;
+  text-decoration: none; margin-top: 18px;
+}
+</style>
+</head>
+<body>
+<div id="prog" style="width:0%"></div>
+
+<header>
+  <div class="logo">⚡ Samsung GenAI</div>
+  <div class="day-badge">DAY 2</div>
+  <div class="lab-badge">Lab 1 — Prompt Framework Builder</div>
+  <div style="margin-left:auto; font-size:12px; color:#7A8FA6;">Individual or pairs · AM · Feeds day2.json</div>
+</header>
+
+<div class="container">
+  <h1>Prompt Framework Builder</h1>
+  <p class="subtitle">Role: Business Technology Analyst, Samsung AI CoE. Apply the 6-element framework to a real Samsung scenario.</p>
+  <span class="unscored-note">📝 Nothing to submit from this page — remember your answers, you'll enter them into Lab 2's combined generator at the end of the day</span>
+
+  <div class="progress-box">
+    <div class="progress-circle" id="pcircle">
+      <span class="progress-inner" id="pnum">0/4</span>
+    </div>
+    <div class="progress-text">
+      <h3 id="ptitle">Let's get started</h3>
+      <p id="psub">Tick each step as you complete it.</p>
+    </div>
+  </div>
+
+  <!-- Step 1 — Choose scenario -->
+  <div class="step-card" id="s1">
+    <div class="step-num">1</div>
+    <div class="step-content">
+      <div class="step-title">Choose ONE business scenario</div>
+      <div class="step-desc">Click a card to select it. You'll write a full 6-element prompt for whichever one you pick.</div>
+      <div class="scenario-grid" id="scenario-grid">
+        <div class="scenario-card" data-name="A" onclick="pickScenario('A', this)">
+          <h4>A — Care+ Escalation Reply</h4>
+          <p>A customer's 3rd Galaxy Watch battery complaint this month, still under warranty. Draft a reply that resolves it without promising a refund.</p>
+        </div>
+        <div class="scenario-card" data-name="B" onclick="pickScenario('B', this)">
+          <h4>B — Competitor Brief</h4>
+          <p>Summarize a fictional competitor's new foldable phone launch for a Samsung product manager, in a boardroom-ready 3-bullet format.</p>
+        </div>
+        <div class="scenario-card" data-name="C" onclick="pickScenario('C', this)">
+          <h4>C — New-Hire FAQ Bot Reply</h4>
+          <p>Draft a chatbot reply answering a new campus recruit's question about laptop provisioning, sounding helpful but not overly casual.</p>
+        </div>
+      </div>
+      <label class="check-label" id="l1"><input type="checkbox" id="c1" onchange="tick(1)"> I've picked my scenario</label>
+    </div>
+  </div>
+
+  <!-- Step 2 — Build the prompt -->
+  <div class="step-card" id="s2">
+    <div class="step-num">2</div>
+    <div class="step-content">
+      <div class="step-title">Write all 6 elements</div>
+      <div class="step-desc">Fill in every field below. As you type, the assembled prompt builds live underneath — that's exactly what you'll paste into an AI tool.</div>
+      <div class="pb-field"><label>Role</label><input id="pb-role" oninput="updatePB()" placeholder="Who should the AI act as?"></div>
+      <div class="pb-field"><label>Goal</label><input id="pb-goal" oninput="updatePB()" placeholder="What exactly should it produce?"></div>
+      <div class="pb-field"><label>Context</label><textarea id="pb-context" rows="2" oninput="updatePB()" placeholder="Background facts the AI has no way to know on its own"></textarea></div>
+      <div class="pb-field"><label>Constraints</label><textarea id="pb-constraints" rows="2" oninput="updatePB()" placeholder="Length limit, must-include, must-avoid"></textarea></div>
+      <div class="pb-field"><label>Style / Tone</label><input id="pb-style" oninput="updatePB()" placeholder="How should it sound?"></div>
+      <div class="pb-field"><label>Output Format</label><input id="pb-output" oninput="updatePB()" placeholder="Exact shape of the answer"></div>
+      <div class="pb-preview" id="pb-preview">Fill in the fields above — your assembled prompt appears here.</div>
+      <label class="check-label" id="l2" style="margin-top:12px;"><input type="checkbox" id="c2" onchange="tick(2)"> All 6 elements written</label>
+    </div>
+  </div>
+
+  <!-- Step 3 — Run it -->
+  <div class="step-card" id="s3">
+    <div class="step-num">3</div>
+    <div class="step-content">
+      <div class="step-title">Run your prompt in one AI tool</div>
+      <div class="step-desc">Copy the assembled prompt from Step 2's preview box, paste it into any one of these, and read the response.</div>
+      <a href="https://chat.openai.com" target="_blank" class="link-btn blue">ChatGPT ↗</a>
+      <a href="https://claude.ai" target="_blank" class="link-btn blue">Claude ↗</a>
+      <a href="https://gemini.google.com" target="_blank" class="link-btn blue">Gemini ↗</a>
+      <div class="info-box">Keep the response visible — you'll judge it against your own Constraints in Step 4.</div>
+      <label class="check-label" id="l3"><input type="checkbox" id="c3" onchange="tick(3)"> I ran the prompt and have a response</label>
+    </div>
+  </div>
+
+  <!-- Step 4 — Self-score -->
+  <div class="step-card" id="s4">
+    <div class="step-num">4</div>
+    <div class="step-content">
+      <div class="step-title">Score the output against your own Constraints</div>
+      <div class="step-desc">Re-read the Constraints you wrote in Step 2. Did the AI's response actually satisfy every one of them — length, must-include, must-avoid?</div>
+      <div class="info-box">This is the "Evaluation & Verification" habit from Section 7 of today's content page — a well-built prompt still needs its output checked, every time.</div>
+      <label class="check-label" id="l4"><input type="checkbox" id="c4" onchange="tick(4)"> I checked the output against my constraints</label>
+    </div>
+  </div>
+
+  <div class="done-banner" id="donebanner">
+    <h2>Lab 1 done. 🎉</h2>
+    <p>Remember your scenario, your 6-element prompt, and whether the output met your constraints — you'll type these into Lab 2's combined submission generator at the end of the day. Nothing to push yet.</p>
+    <p style="margin-top:10px; font-size:12px;">Stretch (optional): repeat Steps 1–4 for one or two more scenarios, or add a strict JSON output format to your first prompt and re-run it.</p>
+    <a href="lab2.html" class="next-btn">Go to Lab 2 →</a>
+  </div>
+</div>
+
+<script>
+let scenarioPicked = null;
+function pickScenario(name, el) {
+  document.querySelectorAll('.scenario-card').forEach(c => c.classList.remove('picked'));
+  el.classList.add('picked');
+  scenarioPicked = name;
+}
+
+function updatePB() {
+  const role = document.getElementById('pb-role').value.trim();
+  const goal = document.getElementById('pb-goal').value.trim();
+  const context = document.getElementById('pb-context').value.trim();
+  const constraints = document.getElementById('pb-constraints').value.trim();
+  const style = document.getElementById('pb-style').value.trim();
+  const output = document.getElementById('pb-output').value.trim();
+  const parts = [];
+  if (role) parts.push(role);
+  if (goal) parts.push(goal);
+  if (context) parts.push(`Context: ${context}`);
+  if (constraints) parts.push(`Constraints: ${constraints}`);
+  if (style) parts.push(`Tone: ${style}`);
+  if (output) parts.push(`Output format: ${output}`);
+  document.getElementById('pb-preview').textContent = parts.length ? parts.join('\n\n') : "Fill in the fields above — your assembled prompt appears here.";
+}
+
+const TOTAL = 4;
+const MSGS = ['Let\'s get started', 'Scenario picked — now build your prompt.', 'Halfway there.', 'Almost done!', 'Lab 1 complete!'];
+
+function tick(n) {
+  const cb = document.getElementById('c' + n);
+  const card = document.getElementById('s' + n);
+  const lbl = document.getElementById('l' + n);
+  if (cb.checked) { card.classList.add('done'); lbl.classList.add('checked'); }
+  else { card.classList.remove('done'); lbl.classList.remove('checked'); }
+  updateProgress();
+}
+
+function updateProgress() {
+  let done = 0;
+  for (let i = 1; i <= TOTAL; i++) {
+    const el = document.getElementById('c' + i);
+    if (el && el.checked) done++;
+  }
+  const deg = Math.round((done / TOTAL) * 360);
+  document.getElementById('pcircle').style.background = `conic-gradient(#00D4AA ${deg}deg, #1E2A5E ${deg}deg)`;
+  document.getElementById('pnum').textContent = done + '/' + TOTAL;
+  document.getElementById('ptitle').textContent = MSGS[done];
+  document.getElementById('psub').textContent = done === TOTAL
+    ? 'Nice work — head to Lab 2 when the trainer signals.'
+    : (TOTAL - done) + ' step' + (TOTAL - done > 1 ? 's' : '') + ' remaining.';
+  document.getElementById('prog').style.width = Math.round((done / TOTAL) * 100) + '%';
+  document.getElementById('donebanner').style.display = done === TOTAL ? 'block' : 'none';
+}
+</script>
+</body>
+</html>

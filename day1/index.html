@@ -437,6 +437,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     </div>
   </div>
 
+  <div class="info-box" style="margin-bottom:14px">
+    <strong>Before the game — two words you need:</strong> A <strong style="color:var(--accent)">Discriminative</strong> model looks at an input and picks a label or a decision from a fixed set of options — "is this spam?", "is this a cat?", "will this loan default?". A <strong style="color:var(--warn)">Generative</strong> model creates brand-new content that didn't exist before — an email, an image, a line of code. Classical ML (the left column above) is almost always discriminative; GenAI (the right column) is generative. That's the entire game below.
+  </div>
+
   <!-- Game: Discriminative vs Generative Sort -->
   <div class="game-card" id="game1">
     <div class="game-header" onclick="toggleGame('game1')">
@@ -525,6 +529,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <button class="btn btn-primary" onclick="changeStep(1)">Next →</button>
   </div>
 
+  <div class="info-box" style="margin-top:24px;margin-bottom:14px">
+    <strong>Before the game — what "temperature" actually is:</strong> it's a number you set whenever you call a model — either in code (<code style="background:var(--bg);padding:1px 6px;border-radius:4px;color:var(--accent)">temperature: 0.7</code>) or in a tool's settings/playground. It controls how far down the model's ranked list of next-word guesses it's allowed to reach.
+    <ul style="margin:8px 0 0 18px;padding:0">
+      <li><strong style="color:var(--accent)">0</strong> — always pick the single most likely word. Deterministic, same answer every time. Use for code, data extraction, factual Q&A.</li>
+      <li><strong style="color:var(--accent-2,#F59E0B)">~1</strong> — the default in most chat tools. Some natural variety, still mostly sensible.</li>
+      <li><strong style="color:#F87171">Higher (up to 2 on some APIs)</strong> — reaches much further down the list. More creative, more surprising, more likely to go off the rails. Use for brainstorming, not for facts.</li>
+    </ul>
+    In the game below, the "HIGH TEMP" card-holders are physically playing temperature ≈ 1.5–2.
+  </div>
+
   <!-- Game: Human Autocomplete -->
   <div class="game-card" id="game3" style="margin-top:32px">
     <div class="game-header" onclick="toggleGame('game3')">
@@ -581,9 +595,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="card-grid card-grid-2" style="margin-bottom:32px">
     <div id="transformer-panel"></div>
     <div>
-      <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:16px">Attention: Q · K · V</div>
+      <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:12px">Attention: Q · K · V</div>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">2-MINUTE ANALOGY — THE COLLEGE LIBRARY</div>
+        <p style="font-size:14px;color:var(--text)">Imagine you're in the college library. You ask: <em>"I need a book on Machine Learning."</em> That request is the whole Q/K/V system in miniature — click each card below to see which part you just played.</p>
+      </div>
       <div style="color:var(--dim);font-size:14px;margin-bottom:16px">Click each to understand what it does</div>
       <div style="display:flex;flex-direction:column;gap:10px" id="qkv-cards"></div>
+      <div class="info-box" style="margin-top:14px">
+        <strong>Query</strong> = what I'm looking for &nbsp;·&nbsp; <strong>Key</strong> = labels used for matching &nbsp;·&nbsp; <strong>Value</strong> = actual information returned
+      </div>
     </div>
   </div>
 </section>
@@ -898,9 +919,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="section-sub">3 labs · Push once at the end of the day</div>
 
   <div class="ach-grid fade-in">
-    <div class="ach-card"><div class="ach-icon">🥈</div><div class="ach-name">Silver</div><div class="ach-desc">Submitted — name + Lab 3 answers filled</div></div>
-    <div class="ach-card"><div class="ach-icon">🥇</div><div class="ach-name">Gold</div><div class="ach-desc">Silver + hallucination correctly identified</div></div>
-    <div class="ach-card"><div class="ach-icon">💎</div><div class="ach-name">Diamond</div><div class="ach-desc">Gold + a working gradio.live URL from Lab 2</div></div>
+    <div class="ach-card"><div class="ach-icon">🥈</div><div class="ach-name">Silver</div><div class="ach-desc">Submitted with your name — at least 1 of Lab 3's 3 investigations documented</div></div>
+    <div class="ach-card"><div class="ach-icon">🥇</div><div class="ach-name">Gold</div><div class="ach-desc">Silver + all 3 investigations documented with evidence, plus your synthesis</div></div>
+    <div class="ach-card"><div class="ach-icon">💎</div><div class="ach-name">Diamond</div><div class="ach-desc">Gold + a verified Lab 2 Gradio link + Lab 3's stretch investigation</div></div>
   </div>
   <div class="card" style="margin-bottom:20px;border-color:var(--accent)40">
     <p style="font-size:14px;color:var(--text)"><strong style="color:var(--accent)">No submission = no medal</strong> (blank/grey on the dashboard). Full step-by-step instructions — including exact git commands — are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day1readme.md</code>. This page tells you <em>what</em> each lab is about; the readme tells you <em>exactly how</em> to do it.</p>
@@ -945,20 +966,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
   <div class="lab-card fade-in">
     <span class="lab-badge">Lab 3 · Individual · Scored</span>
-    <h3>Model Face-Off</h3>
-    <p class="desc">Run 3 fixed prompts — a generic ask, a Samsung product-announcement ask, and a Galaxy S24 spec deep-dive — across ChatGPT, Claude, and Gemini Pro. Score each response, pick a winner per prompt, and catch the hallucination hiding in Prompt 3.</p>
+    <h3>AI Trust Audit</h3>
+    <p class="lab-role">Role: Junior AI Quality Analyst, Samsung AI CoE</p>
+    <p class="desc">Not a "which chatbot sounds nicer" comparison — 3 real investigations across ChatGPT, Claude, and Gemini Pro, each designed to expose a different way AI confidently gets things wrong, ending in your own synthesized findings report.</p>
     <ul class="lab-tasks">
-      <li>P1 — Explain GenAI to your manager (clarity &amp; tone)</li>
-      <li>P2 — Write a Galaxy AI feature announcement (brand voice)</li>
-      <li>P3 — Galaxy S24 AI features deep-dive (⚠ contains a hallucination trap — fact-check every claim)</li>
-      <li>Fill the comparison grid, pick a winner, document the hallucination if you find one</li>
+      <li>Investigation 1 — Technical fact hallucination (Galaxy S24 spec deep-dive, fact-check every claim)</li>
+      <li>Investigation 2 — Fabricated citation hallucination (ask for a specific source, verify it actually exists)</li>
+      <li>Investigation 3 — Bias swap test (identical candidate profile, only the name changes — does the AI's judgment change too?)</li>
+      <li>Write a 3–5 sentence synthesis: would you trust these tools, unsupervised, for a customer-facing or hiring-related task?</li>
     </ul>
-    <a href="lab/lab3.html" class="lab-link">Open Lab 3 — Model Face-Off →</a>
+    <span class="stretch-note">Stretch: design your own 4th investigation testing privacy, copyright, or safety — feeds your Diamond badge</span>
+    <a href="lab/lab3.html" class="lab-link">Open Lab 3 — AI Trust Audit →</a>
   </div>
 
   <div class="card fade-in">
     <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px">Submitting — one push, at the end of the day</div>
-    <p style="font-size:14px;color:var(--text);margin-bottom:10px">Lab 2 and Lab 3 both feed into a single file. After finishing Lab 3, copy the JSON template at the bottom of Lab 3, fill in <strong style="color:var(--white)">both</strong> your Lab 2 fields (team, model used, Gradio URL) <strong style="color:var(--white)">and</strong> your Lab 3 fields (winners, hallucination), save it as <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">submissions/day1.json</code>, and push once. Full steps are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day1readme.md</code>.</p>
+    <p style="font-size:14px;color:var(--text);margin-bottom:10px">Lab 2 and Lab 3 both feed into a single file. After finishing Lab 3, copy the JSON template at the bottom of Lab 3, fill in <strong style="color:var(--white)">both</strong> your Lab 2 fields (team, model used, Gradio URL) <strong style="color:var(--white)">and</strong> your Lab 3 fields (all 3 investigations + your synthesis), save it as <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">submissions/day1.json</code>, and push once. Full steps are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day1readme.md</code>.</p>
     <div class="code-block">git add submissions/day1.json<br>git commit -m "Day 1 submission - YOUR NAME"<br>git push origin main</div>
   </div>
 </section>
@@ -1370,9 +1393,9 @@ function changeStep(dir){
 function initTransformer(){
   setTransformer('before');
   const qkv=[
-    {k:"Q — Query",v:"'What am I looking for?' Each token asks this question of all others. Like a SQL WHERE clause — defining what to match.",color:"#00D4AA"},
-    {k:"K — Key",v:"'What do I have to offer?' Each token advertises its relevance. Like the JOIN column — what others can match against.",color:"#3B82F6"},
-    {k:"V — Value",v:"'What information do I carry?' If my Key matches your Query, I share my Value. Like the SELECT columns — the actual data delivered.",color:"#8B5CF6"},
+    {k:"Q — Query",v:"Your request to the librarian: \"I need a book on Machine Learning.\" Every token in the sentence asks this same question of every other token — \"what am I looking for?\"",color:"#00D4AA"},
+    {k:"K — Key",v:"The label on every book on the shelf — Python, Machine Learning, AI, Networking, Java. The librarian compares your request against every single label to find a match.",color:"#3B82F6"},
+    {k:"V — Value",v:"The actual book content. Once the librarian finds the \"Machine Learning\" label, she hands you the book itself — not just the label. That's the information that actually gets passed along.",color:"#8B5CF6"},
   ];
   document.getElementById('qkv-cards').innerHTML=qkv.map(q=>`
     <div class="accordion-item">

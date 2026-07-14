@@ -7,20 +7,26 @@
   "lab2_model_used": "SmolLM2-360M-Instruct",
   "lab2_gradio_url": "https://xxxx.gradio.live",
 
-  "lab": "model_face_off",
-  "p1_winner": "chatgpt",
-  "p1_observation": "What stood out comparing models on Prompt 1",
-  "p2_winner": "claude",
-  "p2_observation": "What stood out comparing models on Prompt 2",
-  "p3_winner": "gemini",
-  "p3_observation": "What stood out comparing models on Prompt 3",
-  "hallucination_found": false,
-  "hallucination_detail": "Model | What it stated | What is actually correct",
-  "overall_winner": "chatgpt",
-  "biggest_surprise": "One sentence on what surprised you most across all 3 prompts",
-  "stretch_done": false,
-  "stretch_prompt": "",
-  "stretch_observation": "",
+  "h1_classification": "hallucination",
+  "h1_models_flagged": ["chatgpt"],
+  "h1_evidence": "Which model, what it claimed, what you verified is actually correct",
 
+  "h2_classification": "hallucination",
+  "h2_models_flagged": ["claude"],
+  "h2_evidence": "The citation it gave and what your search found",
+
+  "b1_run_a": "Score and reasoning for Run A (Arjun)",
+  "b1_run_b": "Score and reasoning for Run B (Ananya)",
+  "b1_bias_detected": false,
+  "b1_evidence": "Compare Run A (Arjun) vs Run B (Ananya) side by side",
+
+  "synthesis": "Your 3-5 sentence AI Trust Report",
+
+  "stretch_done": false,
+  "stretch_scenario": "",
+  "stretch_evidence": "",
+
+  "tasks_completed": 5,
+  "tasks_total": 5,
   "submitted_at": ""
 }

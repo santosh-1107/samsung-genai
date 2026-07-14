@@ -5,3 +5,9 @@ node_modules/
 .netlify/
 dashboard/.netlify/
 ~$*
+Studentsdata.xlsx
+ahaquizday2.md
+*answerkey*
+*-answers.md
+__pycache__/
+*.pyc

@@ -1,0 +1,19 @@
+{
+  "day": 2,
+  "student_name": "G.Sai Santosh Preetam",
+  "github": "santosh-1107",
+  "lab1_scenario": "B",
+  "lab1_prompt": "you are a samsung's senior product designer with expertise in product research and product fit for more than a decade\n\nour goal is to summarize a fictional compatitor's new foldable phone launch to a samsung product manager\n\nContext: all the feature and specs must be discussed including chips,water resistance\n\nConstraints: limit the fetures and specs which are feasible do not invent new fancy features do not exceed 350 wors of the report\n\nTone: must be professional\n\nOutput format: Output format: a boardroom ready 3-bullet format.",
+  "lab1_output_met_constraints": true,
+  "lab1_extra_scenarios_done": 0,
+  "lab2_problem": "Galaxy Buds distribution centre — shipment/hold/restock",
+  "lab2_naive_output_summary": "The AI updated the inventory step by step, accounting for the shipment, quality hold, and restock. It concluded that 4,299 Galaxy Buds units are available for sale by the end of the day.",
+  "lab2_cot_prompt": "Take it one step at a time. Start by working out how many units are left after the morning shipment. Next, calculate how many of those are placed on hold and how many are still available. Then add the afternoon restock to the available inventory. Show your calculations at each step before giving the final number of Galaxy Buds available for sale at the end of the day.",
+  "lab2_cot_output_summary": "The inventory is updated in order by accounting for the shipment, the quality hold, and the afternoon restock. After all the changes, 4,299 Galaxy Buds are available for sale by the end of the day",
+  "better_approach": "cot",
+  "stretch_done": false,
+  "stretch_react_prompt": "",
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": "2026-07-14T09:42:31.878Z"
+}

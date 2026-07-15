@@ -558,6 +558,18 @@ nav::-webkit-scrollbar-thumb{background:var(--accent)}
     <a href="lab/lab2.html" class="lab-link">Open Lab 2 — RAG vs. No-RAG Showdown →</a>
   </div>
 
+  <div class="lab-card fade-in" style="border-color:var(--success)40">
+    <span class="lab-badge" style="background:var(--success)1A;color:var(--success);border-color:var(--success)4D">Bonus · Not scored · Not submitted</span>
+    <h3>📚 RAG PDF Q&amp;A — a real vector database, running on your own laptop</h3>
+    <p class="desc">Lab 2 above does RAG by hand (copy-pasting a document into a prompt). This is the real thing: upload any PDF, watch it get chunked and embedded into an actual ChromaDB vector index (<code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">nomic-embed-text</code>), then ask questions answered by <code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">llama3.2:1b</code> — 100% local, same models as today's other tools.</p>
+    <ul class="lab-tasks">
+      <li>Setup takes 5 steps: pull both Ollama models → confirm Python → pip install → run — full instructions in <code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">day3/rag-project/SETUP.md</code></li>
+      <li>Try changing <code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">chunk_size</code>/<code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">chunk_overlap</code> in <code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">rag/indexer.py</code> and see how answer quality changes</li>
+      <li>Not scored, nothing to submit — come back to it anytime</li>
+    </ul>
+    <a href="rag-project/SETUP.md" class="lab-link" style="background:var(--success);color:#000">Open Setup Guide — RAG PDF Q&amp;A →</a>
+  </div>
+
   <div class="card fade-in">
     <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px">Submitting — one file, generated for you</div>
     <p style="font-size:14px;color:var(--text);margin-bottom:10px">Lab 2's page has a form covering both Lab 1 (Interrogation Room Recap) and Lab 2 (RAG Showdown) fields. Fill it in, click <strong style="color:var(--white)">Generate &amp; Download day3.json</strong> — your browser saves the file correctly named and typed, no Notepad editing needed. Move it into your <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">submissions</code> folder, then push once. Full steps are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day3readme.md</code>.</p>

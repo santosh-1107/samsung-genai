@@ -19,11 +19,41 @@ function medalCell(achievement) {
   return `<td class="day-cell" title="${m.label}"><span class="medal" style="color:${m.color}">${m.icon}</span></td>`;
 }
 
-function rankBadge(rank) {
-  if (rank === 1) return '<span class="rank-badge gold-rank">🥇 1</span>';
-  if (rank === 2) return '<span class="rank-badge silver-rank">🥈 2</span>';
-  if (rank === 3) return '<span class="rank-badge bronze-rank">🥉 3</span>';
-  return `<span class="rank-num">${rank}</span>`;
+// Top-3 medal — keyed on true score rank, shown next to the name, independent
+// of where the row actually sits in the (now alphabetical) table order.
+function topMedal(rank) {
+  if (rank === 1) return { icon: '🥇', cls: 'gold-rank' };
+  if (rank === 2) return { icon: '🥈', cls: 'silver-rank' };
+  if (rank === 3) return { icon: '🥉', cls: 'bronze-rank' };
+  return null;
+}
+
+// Per-day breakdown — "Total Students" up top stays a single overall number,
+// but submitted-count and top-score are date-wise (per day), not summed across days.
+function renderDayStats(students, totalDays, totalStudents) {
+  let cards = '';
+  for (let d = 1; d <= totalDays; d++) {
+    const dayEntries = students
+      .map(s => (s.days || []).find(x => x.day === d))
+      .filter(Boolean);
+    const submittedCount = dayEntries.filter(x => x.achievement !== null).length;
+    const scores = dayEntries.map(x => x.score || 0);
+    const topScore = scores.length ? Math.max(...scores) : 0;
+
+    cards += `
+      <div class="day-stat">
+        <div class="day-stat-label">Day ${d}</div>
+        <div class="day-stat-row">
+          <span class="day-stat-num">${submittedCount}/${totalStudents}</span>
+          <span class="day-stat-sub">submitted</span>
+        </div>
+        <div class="day-stat-row">
+          <span class="day-stat-num gold-num">${topScore > 0 ? (topScore % 1 === 0 ? topScore.toFixed(0) : topScore.toFixed(1)) : '—'}</span>
+          <span class="day-stat-sub">top score</span>
+        </div>
+      </div>`;
+  }
+  document.getElementById('day-stats-bar').innerHTML = cards;
 }
 
 function render(data) {
@@ -37,12 +67,10 @@ function render(data) {
   const students = data.students || [];
 
   document.getElementById('stat-total').textContent = data.total_students ?? '–';
-  document.getElementById('stat-submitted').textContent =
-    students.filter(s => s.daysSubmitted > 0).length;
-  document.getElementById('stat-score').textContent =
-    students.length > 0 ? Math.max(...students.map(s => s.totalScore)).toFixed(0) : '–';
   document.getElementById('updated').textContent =
     data.generated_at ? `Updated ${new Date(data.generated_at).toLocaleTimeString()}` : '';
+
+  renderDayStats(students, totalDays, data.total_students ?? students.length);
 
   if (students.length === 0) {
     document.getElementById('content').innerHTML =
@@ -56,16 +84,23 @@ function render(data) {
     dayHeaders += `<th class="day-header">Day ${d}</th>`;
   }
 
-  // Build student rows
+  // Build student rows — table order is alphabetical, so "#" is just the row
+  // position in that list. Actual score standing (top-3 medal) is shown next
+  // to the name instead, since it no longer matches row position.
   let rows = '';
-  students.forEach(s => {
+  students.forEach((s, i) => {
+    const position = i + 1;
     const dayCells = s.days.map(d => medalCell(d.achievement)).join('');
     const hasAny = s.daysSubmitted > 0;
+    const medal = topMedal(s.rank);
+    const medalHTML = medal
+      ? ` <span class="rank-badge ${medal.cls}" title="Rank #${s.rank} overall by score">${medal.icon} #${s.rank}</span>`
+      : '';
     rows += `
       <tr class="${hasAny ? 'active-row' : 'pending-row'}">
-        <td class="rank-cell">${rankBadge(s.rank)}</td>
+        <td class="rank-cell"><span class="rank-num">${position}</span></td>
         <td class="name-cell">
-          <div class="student-name">${escapeHTML(s.name)}</div>
+          <div class="student-name">${escapeHTML(s.name)}${medalHTML}</div>
           <div class="student-github">@${escapeHTML(s.github)}</div>
         </td>
         ${dayCells}

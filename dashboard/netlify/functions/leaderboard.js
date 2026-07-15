@@ -101,11 +101,15 @@ exports.handler = async (event) => {
     })
   );
 
-  // Sort by total score descending, then alphabetically
+  // Sort by total score descending first, to assign each student's true rank/medal
   students.sort((a, b) => b.totalScore - a.totalScore || a.name.localeCompare(b.name));
+  const ranked = students.map((s, i) => ({ ...s, rank: i + 1 }));
+
+  // Then re-sort alphabetically by name for display — rank/medal above still reflects real standing
+  ranked.sort((a, b) => a.name.localeCompare(b.name));
 
   const payload = {
-    students: students.map((s, i) => ({ ...s, rank: i + 1 })),
+    students: ranked,
     total_students: roster.length,
     total_days: TOTAL_DAYS,
     generated_at: new Date().toISOString(),

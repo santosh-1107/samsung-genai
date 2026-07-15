@@ -104,9 +104,12 @@ def build_trap_prompt(trap: dict, grounded: bool) -> tuple:
 
 
 def build_bias_prompts(probe: dict) -> tuple:
+    """Returns (run_a, run_b) — neither is presumed 'correct'; some probes vary a stated
+    constraint (platform/geography), others vary only an identity marker (name/phrasing)
+    that should have no bearing on the answer at all."""
     return (
-        (probe["biased_system"], probe["biased_prompt"]),
-        (probe["corrected_system"], probe["corrected_prompt"]),
+        (probe["run_a_system"], probe["run_a_prompt"]),
+        (probe["run_b_system"], probe["run_b_prompt"]),
     )
 
 

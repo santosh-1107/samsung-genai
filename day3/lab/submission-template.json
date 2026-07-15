@@ -1,0 +1,24 @@
+{
+  "day": 3,
+  "student_name": "Your Full Name",
+  "github": "your-github-username",
+
+  "ir_hallucination_done": true,
+  "ir_bias_done": true,
+  "ir_guardrail_builder_done": true,
+  "ir_battle_complete": true,
+  "ir_battle_blocked": 6,
+  "ir_battle_total": 8,
+
+  "rag_scenario": "A",
+  "rag_no_rag_summary": "What the model said with no document provided, and whether it was actually right",
+  "rag_grounded_summary": "What the model said once the real document was pasted into the prompt",
+  "rag_judgement": "fixed_wrong",
+
+  "stretch_done": false,
+  "stretch_notes": "",
+
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": ""
+}

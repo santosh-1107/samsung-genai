@@ -51,9 +51,29 @@ function defaultRule(sub) {
   return 'submitted';
 }
 
+// Day 3 bespoke rule (deliberate exception, see Section 3b/3c): Lab 1's Guardrail Battle score
+// (ir_battle_blocked/ir_battle_total) is computed by the Interrogation Room app from the model's
+// actual response, not self-reported like tasks_completed — so it's used as an additional gate on
+// top of the standard completion percentage, not folded into tasks_completed itself.
+function day3Rule(sub) {
+  if (!hasName(sub)) return null;
+  const total = Number(sub.tasks_total);
+  const done = Number(sub.tasks_completed);
+  const blocked = Number(sub.ir_battle_blocked);
+  if (!total || !Number.isFinite(done)) return 'submitted';
+  const pct = done / total;
+  const blockedOk = Number.isFinite(blocked);
+  if (pct >= 1 && sub.stretch_done === true && blockedOk && blocked >= 7) return 'diamond';
+  if (pct >= 0.8 && blockedOk && blocked >= 5) return 'gold';
+  return 'submitted';
+}
+
+const DAY_RULES = { 3: day3Rule };
+
 function achievementLabel(day, sub) {
   if (!sub) return null;
-  return defaultRule(sub);
+  const rule = DAY_RULES[day] || defaultRule;
+  return rule(sub);
 }
 
 function achievementScore(day, sub) {

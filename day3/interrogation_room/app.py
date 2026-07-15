@@ -1,6 +1,6 @@
 """
 AI Interrogation Room
-Samsung GenAI Program · Bonus practice tool · Runs on your own laptop, 100% local Ollama, no API key
+Samsung GenAI Program · Day 3, Lab 1 · Runs on your own laptop, 100% local Ollama, no API key
 """
 
 import time
@@ -27,6 +27,7 @@ h1{font-size:32px!important}h2{font-size:24px!important}h3{font-size:20px!import
 .halluc-box{background:#FEF2F2;border:2px solid #EF4444;border-radius:10px;padding:16px;color:#991B1B}
 .grounded-box{background:#F0FDF4;border:2px solid #10B981;border-radius:10px;padding:16px;color:#065F46}
 .neutral-box{background:#F0F9FF;border:1px solid #0EA5E9;border-radius:10px;padding:16px;color:#0C4A6E}
+.neutral-box2{background:#FAF5FF;border:1px solid #A855F7;border-radius:10px;padding:16px;color:#581C87}
 .blocked-box{background:#F0FDF4;border:3px solid #10B981;border-radius:12px;padding:20px;text-align:center}
 .bypassed-box{background:#FEF2F2;border:3px solid #EF4444;border-radius:12px;padding:20px;text-align:center}
 .attack-card{background:#141B2D;border:1px solid #1E2A3D;border-radius:10px;padding:16px}
@@ -50,6 +51,25 @@ for k, v in {
 }.items():
     if k not in st.session_state:
         st.session_state[k] = v
+
+
+def compute_results() -> dict:
+    """Single source of truth for what counts as 'attempted' per module.
+    Mirrors the field names Lab 2's Interrogation Room Recap form expects."""
+    trap_ids_touched = {k for k in st.session_state.keys() if k.startswith("trap_result_")}
+    bias_ids_touched = {k for k in st.session_state.keys() if k.startswith("bias_result_")}
+    battle_total = len(st.session_state.battle_scores)
+    battle_blocked = sum(1 for s in st.session_state.battle_scores if s)
+    return {
+        "hallucination_done": len(trap_ids_touched) > 0 or "free_result" in st.session_state,
+        "traps_engaged": len(trap_ids_touched),
+        "bias_done": len(bias_ids_touched) > 0,
+        "bias_probes_run": len(bias_ids_touched),
+        "guardrail_builder_done": "guard_result" in st.session_state,
+        "battle_complete": battle_total >= len(ADVERSARIAL_ATTACKS),
+        "battle_blocked": battle_blocked,
+        "battle_total": battle_total,
+    }
 
 
 def get_model() -> str:
@@ -95,6 +115,7 @@ with st.sidebar:
         "2️⃣  Bias Probe",
         "3️⃣  Guardrail Builder",
         "4️⃣  Guardrail Battle",
+        "📤  My Results",
     ], label_visibility="collapsed")
 
     st.divider()
@@ -104,22 +125,23 @@ with st.sidebar:
         blocked = sum(1 for s in st.session_state.battle_scores if s)
         st.metric("🛡️ Attacks blocked", f"{blocked}/{len(st.session_state.battle_scores)}")
     st.divider()
-    st.caption("This is a bonus practice tool — not scored, not submitted. Come back to it anytime.")
+    st.caption("Day 3 · Lab 1. Scored — carry your numbers from **📤 My Results** into Lab 2's Interrogation Room Recap to submit.")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 def page_briefing():
     st.title("🔍 The AI Interrogation Room")
-    st.subheader("Samsung GenAI Program · Bonus Practice Tool")
+    st.subheader("Samsung GenAI Program · Day 3 · Lab 1 (scored)")
 
     col1, col2 = st.columns([3, 2])
     with col1:
         st.markdown("""
         ### Mission Brief
 
-        You've spent the last few days learning **what GenAI is** and **how it works**.
+        You've spent the last two days learning **what GenAI is** and **how it works**.
+        Today's lecture covered how foundation models get evaluated and selected for real use.
 
-        Now it's time to put it under pressure — yourself, on your own laptop.
+        Now it's time to put one under pressure yourself, on your own laptop.
 
         This tool has 4 missions:
 
@@ -132,15 +154,19 @@ def page_briefing():
 
         The key insight you'll leave with:
         > *AI is not magic. It is engineerable — and so are its failures.*
+
+        This connects directly to Lab 2 (RAG vs No-RAG): Module 1 shows you a model
+        guessing with no grounding — Lab 2 shows you the fix.
         """)
 
     with col2:
         st.info("""
         **How to use this:**
 
-        - Self-paced — work through the 4 modules at your own speed
+        - Work through all 4 modules — each one counts toward your Lab 1 checklist
         - Predict before each attack in Module 4, then check yourself
-        - Nothing here is scored or submitted — it's pure practice
+        - When done, open **📤 My Results** and carry those numbers into
+          Lab 2's *Interrogation Room Recap* section to submit `day3.json`
 
         **No API key needed — runs 100% on your own laptop.**
         """)
@@ -303,7 +329,7 @@ def page_hallucination():
 # ══════════════════════════════════════════════════════════════════════════════
 def page_bias():
     st.title("2️⃣ Bias Probe")
-    st.caption("Same task · two prompts · see what changes")
+    st.caption("Same task · two runs · see what changes and why that's the finding")
 
     probe_idx = st.selectbox(
         "Select bias probe:",
@@ -316,37 +342,37 @@ def page_bias():
 
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("#### ❌ Biased Prompt")
+        st.markdown(f"#### {probe['run_a_label']}")
         with st.expander("See prompt"):
-            st.markdown(f"**System:** `{probe['biased_system']}`")
-            st.code(probe["biased_prompt"], language="text")
+            st.markdown(f"**System:** `{probe['run_a_system']}`")
+            st.code(probe["run_a_prompt"], language="text")
 
     with col2:
-        st.markdown("#### ✅ Corrected Prompt")
+        st.markdown(f"#### {probe['run_b_label']}")
         with st.expander("See prompt"):
-            st.markdown(f"**System:** `{probe['corrected_system']}`")
-            st.code(probe["corrected_prompt"], language="text")
+            st.markdown(f"**System:** `{probe['run_b_system']}`")
+            st.code(probe["run_b_prompt"], language="text")
 
     if st.button("⚡ Run Both Simultaneously", key="run_bias", use_container_width=True):
-        (bs, bu), (cs, cu) = build_bias_prompts(probe)
+        (as_, au), (bs, bu) = build_bias_prompts(probe)
         with st.spinner("Running both prompts..."):
             t0 = time.perf_counter()
-            biased_text, _ = active_call(bs, bu, max_tokens=600)
-            corrected_text, _ = active_call(cs, cu, max_tokens=600)
+            run_a_text, _ = active_call(as_, au, max_tokens=600)
+            run_b_text, _ = active_call(bs, bu, max_tokens=600)
             elapsed = time.perf_counter() - t0
-        if biased_text and corrected_text:
-            st.session_state[f"bias_result_{probe_idx}"] = (biased_text, corrected_text, elapsed)
+        if run_a_text and run_b_text:
+            st.session_state[f"bias_result_{probe_idx}"] = (run_a_text, run_b_text, elapsed)
         else:
             st.error("❌ One or both calls failed — check the Ollama connection in the sidebar.")
 
     result_key = f"bias_result_{probe_idx}"
     if result_key in st.session_state:
-        biased_text, corrected_text, elapsed = st.session_state[result_key]
+        run_a_text, run_b_text, elapsed = st.session_state[result_key]
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown(f'<div class="halluc-box"><b>❌ Biased Output</b><br><br>{biased_text}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="neutral-box"><b>{probe["run_a_label"]}</b><br><br>{run_a_text}</div>', unsafe_allow_html=True)
         with col2:
-            st.markdown(f'<div class="grounded-box"><b>✅ Corrected Output</b><br><br>{corrected_text}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="neutral-box2"><b>{probe["run_b_label"]}</b><br><br>{run_b_text}</div>', unsafe_allow_html=True)
         st.caption(f"⏱ Both calls: {elapsed:.2f}s total")
 
         st.divider()
@@ -354,11 +380,13 @@ def page_bias():
         st.markdown(f"""
         **Probe:** {probe['label']}
 
-        **What changed in the corrected prompt:**
-        - System: `{probe['biased_system']}` → `{probe['corrected_system']}`
+        **{probe['discussion_prompt']}**
 
         **Key takeaway:** Bias is not random — it is **predictable** and **engineerable**.
-        Specify platform, locale, conventions, and constraints explicitly every time.
+        Whether the model defaulted to an unstated assumption (platform, locale) or treated two
+        otherwise-identical requests differently because of an irrelevant detail (a name, a phrasing
+        style), the fix is the same: make the assumption explicit or remove the irrelevant signal,
+        then re-test — don't assume one clean run means it's fixed for good.
         """)
 
 
@@ -621,11 +649,65 @@ def page_battle():
 
 
 # ══════════════════════════════════════════════════════════════════════════════
+def page_results():
+    st.title("📤 My Results")
+    st.caption("Copy these exact values into Lab 2's Interrogation Room Recap section")
+
+    r = compute_results()
+    tasks = [
+        ("Hallucination Lab attempted (fired at least 1 trap or free-input prompt)", r["hallucination_done"]),
+        ("Bias Probe attempted (ran at least 1 probe)", r["bias_done"]),
+        ("Guardrail Builder tested (fired at least 1 request with your own guardrail)", r["guardrail_builder_done"]),
+        ("Guardrail Battle completed (reached the final results screen)", r["battle_complete"]),
+    ]
+    done_count = sum(1 for _, done in tasks if done)
+
+    col1, col2 = st.columns([3, 2])
+    with col1:
+        st.markdown("### Checklist")
+        for label, done in tasks:
+            st.markdown(f"{'✅' if done else '⬜'} {label}")
+
+        st.markdown("### Guardrail Battle score")
+        if r["battle_total"] == 0:
+            st.warning("You haven't started the Guardrail Battle yet — it's the main score driver for Lab 1.")
+        else:
+            st.markdown(f'<div class="score-big">{r["battle_blocked"]}/{r["battle_total"]}</div>', unsafe_allow_html=True)
+            if not r["battle_complete"]:
+                st.caption(f"In progress — {len(ADVERSARIAL_ATTACKS) - r['battle_total']} attack(s) left.")
+            elif r["battle_blocked"] >= 7:
+                st.success("🟣 Diamond-track pace (≥7/8 blocked) — nice guardrail.")
+            elif r["battle_blocked"] >= 5:
+                st.info("🟡 Gold-track pace (≥5/8 blocked).")
+            else:
+                st.warning("⚪ Below the Gold threshold (5/8). Rewrite your guardrail on the Guardrail Builder page, then Reset Battle and try again — you're allowed to iterate.")
+
+    with col2:
+        st.markdown("### Copy into Lab 2")
+        st.code(
+            f"Hallucination Lab attempted: {'Yes' if r['hallucination_done'] else 'No'}\n"
+            f"Bias Probe attempted: {'Yes' if r['bias_done'] else 'No'}\n"
+            f"Guardrail Builder tested: {'Yes' if r['guardrail_builder_done'] else 'No'}\n"
+            f"Guardrail Battle completed: {'Yes' if r['battle_complete'] else 'No'}\n"
+            f"Guardrail Battle blocked: {r['battle_blocked']}\n"
+            f"Guardrail Battle total: {r['battle_total']}\n"
+            f"Model used: {get_model()}",
+            language="text",
+        )
+        st.caption(f"{done_count}/4 Lab 1 checklist items complete.")
+        if done_count < 4 or not r["battle_complete"]:
+            st.warning("Finish every module above before moving to Lab 2 — Lab 2's Recap form asks for these exact numbers.")
+        else:
+            st.success("All 4 modules done. Head to Lab 2 (RAG vs No-RAG Showdown) and fill in the Recap section with these numbers.")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
 def main():
     if   "Briefing"          in module: page_briefing()
     elif "Hallucination Lab" in module: page_hallucination()
     elif "Bias Probe"        in module: page_bias()
     elif "Guardrail Builder" in module: page_guardrail_builder()
     elif "Guardrail Battle"  in module: page_battle()
+    elif "My Results"        in module: page_results()
 
 main()

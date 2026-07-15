@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 — Foundation Models and Platforms | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D111F;--card:#141B2D;--card2:#1A2235;--accent:#00D4AA;--accent2:#0099CC;--white:#FFFFFF;--text:#BBC8D8;--dim:#7A8FA6;--danger:#EF4444;--warn:#F59E0B;--success:#10B981;--border:#1E2A3D}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(13,17,31,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;gap:4px;overflow-x:auto}
+nav::-webkit-scrollbar{height:3px}
+nav::-webkit-scrollbar-thumb{background:var(--accent)}
+.nav-pill{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;color:var(--dim);text-decoration:none;transition:.2s;border:1px solid transparent;cursor:pointer}
+.nav-pill:hover,.nav-pill.active{background:var(--accent)20;color:var(--accent);border-color:var(--accent)40}
+.nav-brand{font-size:13px;font-weight:800;color:var(--accent);margin-right:16px;white-space:nowrap;flex-shrink:0}
+.nav-prog{margin-left:auto;font-size:11px;color:var(--dim);flex-shrink:0;white-space:nowrap}
+
+/* SECTIONS */
+.section{min-height:100vh;padding:80px 48px 48px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+.section-title{font-size:36px;font-weight:800;color:var(--white);margin-bottom:8px;line-height:1.2}
+.section-sub{font-size:18px;color:var(--dim);margin-bottom:32px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.card-grid{display:grid;gap:16px}
+.card-grid-2{grid-template-columns:1fr 1fr}
+.card-grid-3{grid-template-columns:1fr 1fr 1fr}
+.card-grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:900px){.card-grid-2,.card-grid-3,.card-grid-4{grid-template-columns:1fr}}
+.accent-bar{width:40px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:12px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#00F0C0}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)60}
+.btn-ghost:hover{background:var(--accent)15}
+.btn-sm{padding:8px 16px;font-size:13px}
+
+/* BADGES */
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-accent{background:var(--accent)20;color:var(--accent);border:1px solid var(--accent)40}
+.badge-danger{background:var(--danger)20;color:var(--danger);border:1px solid var(--danger)40}
+.badge-warn{background:var(--warn)20;color:var(--warn);border:1px solid var(--warn)40}
+.badge-success{background:var(--success)20;color:var(--success);border:1px solid var(--success)40}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{background:#00274D;color:var(--accent);font-size:13px;font-weight:700;padding:12px 16px;text-align:left}
+.data-table td{padding:11px 16px;font-size:14px;border-bottom:1px solid var(--border)}
+.data-table tr:nth-child(even) td{background:var(--card2)}
+.data-table tr:hover td{background:#1E2A3D}
+
+/* ACCORDION */
+.accordion-item{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.accordion-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--white);background:var(--card);transition:.2s}
+.accordion-header:hover{background:var(--card2)}
+.accordion-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
+.accordion-body.open{max-height:500px;padding:16px 20px}
+.chevron{transition:.3s;color:var(--accent)}
+.chevron.open{transform:rotate(180deg)}
+
+/* CODE / DANGER BLOCKS */
+.code-block{background:#090D18;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);white-space:pre-wrap;margin:8px 0}
+.danger-block{background:var(--danger)10;border:1px solid var(--danger)30;border-radius:6px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#FCA5A5;white-space:pre-wrap;margin:8px 0}
+.prevent-tip{background:var(--success)10;border-left:3px solid var(--success);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#6EE7B7;margin-top:8px}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.fade-in{animation:fadeIn .4s ease}
+
+/* HERO */
+.hero-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+@media(max-width:900px){.hero-grid{grid-template-columns:repeat(2,1fr)}}
+.hero-tile{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.2s;text-decoration:none}
+.hero-tile:hover{border-color:var(--accent);transform:translateY(-3px)}
+.hero-tile-num{font-size:11px;font-weight:700;color:var(--accent)}
+.hero-tile-label{font-size:14px;font-weight:600;color:var(--white);margin-top:4px}
+
+/* TOGGLE / TABS */
+.toggle-wrap{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:24px;flex-wrap:wrap}
+.toggle-btn{padding:12px 28px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.2s}
+.toggle-btn.active{background:var(--accent);color:#000}
+.toggle-btn:not(.active){background:var(--card);color:var(--dim)}
+
+/* FLIP CARDS */
+.flip-card{perspective:1000px;cursor:pointer}
+.flip-inner{transition:transform .6s;transform-style:preserve-3d;position:relative}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{backface-visibility:hidden;border-radius:12px;padding:22px;min-height:190px;box-sizing:border-box}
+.flip-front{background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.flip-back{background:var(--card2);border:1px solid var(--accent)40;position:absolute;top:0;left:0;right:0;bottom:0;transform:rotateY(180deg);overflow:auto}
+
+/* MODEL SELECTOR */
+.selector-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:900px){.selector-grid{grid-template-columns:1fr}}
+.priority-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:20px;border:1px solid var(--border);background:var(--card2);cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);margin:4px 6px 4px 0;transition:.15s}
+.priority-chip.active{border-color:var(--accent);background:var(--accent)1A;color:var(--accent)}
+.selector-result{background:#090D18;border:1px solid var(--accent)40;border-radius:10px;padding:18px;font-size:14px;color:var(--text);line-height:1.7;min-height:100px}
+
+/* GAME CARDS (in-class activities) */
+.game-card{background:#7C3AED0F;border:1px solid #7C3AED55;border-radius:12px;overflow:hidden;margin:20px 0}
+.game-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer}
+.game-header:hover{background:#7C3AED0A}
+.game-header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.game-tag{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#C4B5FD;background:#7C3AED26;border:1px solid #7C3AED4D;border-radius:4px;padding:3px 8px}
+.game-title{font-size:16px;font-weight:700;color:#C4B5FD}
+.game-toggle{font-size:18px;color:#A78BFA;transition:.3s}
+.game-card.open .game-toggle{transform:rotate(90deg)}
+.game-body{display:none;padding:0 20px 20px}
+.game-card.open .game-body{display:block;animation:fadeIn .3s}
+.game-dur{font-size:12px;color:#A78BFA;border:1px solid #7C3AED4D;border-radius:4px;padding:2px 9px;margin-bottom:12px;display:inline-block}
+.game-desc{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.6}
+.game-primer{background:#7C3AED14;border-left:3px solid #7C3AED88;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:14px;font-size:13.5px;color:#C4B5FD;line-height:1.6}
+.game-steps{list-style:none;padding:0;counter-reset:gs}
+.game-steps li{counter-increment:gs;display:flex;gap:10px;margin-bottom:10px;font-size:14px;color:var(--text)}
+.game-steps li::before{content:counter(gs);min-width:22px;height:22px;border-radius:50%;background:#7C3AED33;color:#A78BFA;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.game-debrief{margin-top:12px;padding:10px 14px;background:var(--success)10;border-left:3px solid var(--success);border-radius:0 8px 8px 0;font-size:13.5px;color:#6EE7B7}
+.game-reveal-list{margin-top:10px;padding-left:0;list-style:none}
+.game-reveal-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;padding:10px 14px;border:1px solid #7C3AED33;border-radius:8px;margin-bottom:6px;background:#7C3AED08;transition:.15s}
+.game-reveal-list li:hover{border-color:#7C3AED66;background:#7C3AED14}
+.game-reveal-list .game-q{font-size:14px;color:var(--white)}
+.game-reveal-list .game-a{font-size:13px;font-weight:700;opacity:0;transition:opacity .2s}
+.game-reveal-list li.revealed .game-a{opacity:1}
+
+/* SELF-CHECK */
+.selfcheck{background:#7C3AED12;border:1px solid #7C3AED4D;border-radius:10px;padding:18px 20px;margin:20px 0}
+.selfcheck-q{font-size:15px;color:#C4B5FD;margin-bottom:12px;font-weight:600;line-height:1.5}
+.selfcheck-btn{font-size:13px;background:#7C3AED26;border:1px solid #7C3AED66;color:#A78BFA;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600}
+.selfcheck-btn:hover{background:#7C3AED3D}
+.selfcheck-ans{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #7C3AED33;font-size:14px;color:var(--text);line-height:1.65}
+.selfcheck-ans.show{display:block;animation:fadeIn .3s}
+
+/* QUIZ */
+.quiz-q{font-size:20px;font-weight:700;color:var(--white);margin-bottom:24px;line-height:1.4}
+.quiz-opt{padding:16px 20px;border:2px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:10px;font-size:16px;transition:.2s;background:var(--card)}
+.quiz-opt:hover:not(.disabled){border-color:var(--accent);background:var(--accent)10}
+.quiz-opt.correct{border-color:var(--success);background:var(--success)15;color:var(--success)}
+.quiz-opt.wrong{border-color:var(--danger);background:var(--danger)10;color:#FCA5A5}
+.quiz-opt.disabled{cursor:default;pointer-events:none}
+.quiz-progress{display:flex;gap:6px;margin-bottom:24px}
+.quiz-prog-dot{width:32px;height:4px;border-radius:2px;background:var(--border)}
+.quiz-prog-dot.done{background:var(--accent)}
+.quiz-prog-dot.current{background:var(--accent)60}
+.score-ring{width:140px;height:140px;border-radius:50%;border:8px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px}
+.score-num{font-size:42px;font-weight:800;color:var(--white)}
+.score-total{font-size:16px;color:var(--dim)}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:10px;height:10px;z-index:9999;animation:fall 3s linear forwards;pointer-events:none}
+
+/* LABS SECTION */
+.lab-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:18px}
+.lab-badge{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--accent)1A;color:var(--accent);border:1px solid var(--accent)4D;border-radius:4px;padding:4px 11px;display:inline-block;margin-bottom:14px}
+.lab-card h3{font-size:21px;font-weight:800;color:var(--white);margin-bottom:8px}
+.lab-role{font-size:13px;color:var(--accent2);margin-bottom:10px;font-weight:600}
+.lab-card .desc{font-size:15px;color:var(--text);margin-bottom:16px;line-height:1.65}
+.lab-tasks{padding-left:20px;font-size:14.5px;color:var(--text)}
+.lab-tasks li{margin-bottom:8px;line-height:1.6}
+.stretch-note{display:inline-block;font-size:12.5px;color:var(--warn);border:1px solid var(--warn)4D;border-radius:6px;padding:8px 14px;margin:12px 0}
+.lab-link{display:inline-block;margin-top:16px;background:var(--accent);color:#000;font-weight:700;font-size:14px;text-decoration:none;padding:11px 22px;border-radius:8px;transition:.2s}
+.lab-link:hover{background:#00F0C0}
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+@media(max-width:700px){.ach-grid{grid-template-columns:1fr}}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.ach-icon{font-size:26px;margin-bottom:6px}
+.ach-name{font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px}
+.ach-desc{font-size:12px;color:var(--dim)}
+
+/* AHASLIDES QUIZ MARKER */
+.quiz-marker{background:#DB27771A;border:1px solid #DB277759;border-radius:10px;padding:16px 22px;margin:26px 0;display:flex;align-items:center;gap:16px}
+.quiz-icon{font-size:22px;flex-shrink:0}
+.quiz-title{font-size:14px;font-weight:700;color:#F472B6}
+.quiz-desc{font-size:12.5px;color:var(--dim);margin-top:3px}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="main-nav">
+  <span class="nav-brand">⚡ Samsung GenAI · Day 3</span>
+  <a class="nav-pill active" href="#s1">Mission</a>
+  <a class="nav-pill" href="#s2">Foundation Models</a>
+  <a class="nav-pill" href="#s3">Task-Specific</a>
+  <a class="nav-pill" href="#s4">Industry-Specific</a>
+  <a class="nav-pill" href="#s5">Architecture</a>
+  <a class="nav-pill" href="#s6">Open vs Closed</a>
+  <a class="nav-pill" href="#s7">Leading Models</a>
+  <a class="nav-pill" href="#s8">AI Platforms</a>
+  <a class="nav-pill" href="#s9">Model Selection</a>
+  <a class="nav-pill" href="#s10">Enterprise</a>
+  <a class="nav-pill" href="#s11">Practice Quiz</a>
+  <a class="nav-pill" href="#labs">Labs</a>
+  <span class="nav-prog" id="nav-prog">Section 1 / 12</span>
+</nav>
+
+<!-- ══════════════════════════ S1 — HERO ══════════════════════════ -->
+<section class="section" id="s1" style="background:radial-gradient(ellipse at 60% 40%,#00D4AA08 0%,transparent 60%)">
+  <div class="section-label">Day 3 · Chapter 3</div>
+  <div class="section-title">Foundation Models and Platforms</div>
+  <div class="section-sub">Day 1 taught you what GenAI is. Day 2 taught you how to talk to it. Today: which model, on which platform, for which job — the question every real enterprise deployment starts with.</div>
+  <div class="card" style="max-width:760px">
+    <p style="font-size:15px;color:var(--text);line-height:1.7">There is no single "best" AI model — there's a best model <em>for a specific job, budget, and risk tolerance</em>. By the end of today you'll be able to name the major foundation models and platforms, explain what makes one better suited than another for a given task, and put that judgement to the test twice: once stress-testing a model's reliability yourself (Lab 1), once comparing grounded vs. ungrounded answers on the same question (Lab 2).</p>
+  </div>
+  <div class="hero-grid">
+    <a class="hero-tile" href="#s2"><div class="hero-tile-num">S2</div><div class="hero-tile-label">Foundation Models</div></a>
+    <a class="hero-tile" href="#s3"><div class="hero-tile-num">S3</div><div class="hero-tile-label">Task-Specific FMs</div></a>
+    <a class="hero-tile" href="#s4"><div class="hero-tile-num">S4</div><div class="hero-tile-label">Industry-Specific FMs</div></a>
+    <a class="hero-tile" href="#s5"><div class="hero-tile-num">S5</div><div class="hero-tile-label">FM Architecture</div></a>
+    <a class="hero-tile" href="#s6"><div class="hero-tile-num">S6</div><div class="hero-tile-label">Open vs Closed</div></a>
+    <a class="hero-tile" href="#s7"><div class="hero-tile-num">S7</div><div class="hero-tile-label">Leading Models</div></a>
+    <a class="hero-tile" href="#s8"><div class="hero-tile-num">S8</div><div class="hero-tile-label">AI Platforms</div></a>
+    <a class="hero-tile" href="#s9"><div class="hero-tile-num">S9</div><div class="hero-tile-label">Model Selection</div></a>
+    <a class="hero-tile" href="#s10"><div class="hero-tile-num">S10</div><div class="hero-tile-label">Enterprise Considerations</div></a>
+    <a class="hero-tile" href="#labs"><div class="hero-tile-num">Labs</div><div class="hero-tile-label">Your Mission Today</div></a>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S2 — DIVERSE FOUNDATION MODELS ══════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-label">Unit 1</div>
+  <div class="section-title">Exploring Diverse Foundation Models</div>
+  <div class="section-sub">One base model, trained once, reused for hundreds of downstream tasks.</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="color:var(--white);margin-bottom:8px">Stanford HAI definition</h4>
+    <p style="font-size:14px;line-height:1.7">A <strong style="color:var(--accent)">foundation model</strong> is trained on broad data at scale, using self-supervised learning, so it can be <em>adapted</em> (fine-tuned or prompted) to a wide range of downstream tasks — rather than being built from scratch for each one. GPT, Claude, and Gemini are all foundation models; a spam classifier trained only on spam emails is not.</p>
+  </div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <div class="accent-bar"></div>
+      <h4 style="color:var(--white);margin-bottom:8px">Pre-training vs. Fine-tuning</h4>
+      <p style="font-size:14px;line-height:1.65"><strong style="color:var(--accent)">Pre-training</strong> — one expensive pass over a massive, broad dataset (a large chunk of the public internet), producing a general-purpose base model. <strong style="color:var(--accent)">Fine-tuning</strong> — a much cheaper, smaller second pass on task-specific data, adapting that base model to a narrower job (e.g. a legal-contract reviewer).</p>
+    </div>
+    <div class="card">
+      <div class="accent-bar"></div>
+      <h4 style="color:var(--white);margin-bottom:8px">Self-Supervised Learning</h4>
+      <p style="font-size:14px;line-height:1.65">The model creates its own training labels from the raw data itself — e.g. "predict the next word" needs no human to label anything. This is why foundation models can train on the scale of the internet: there's no manual labelling bottleneck.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="color:var(--white);margin-bottom:10px">Emergent Abilities &amp; Scaling Laws</h4>
+    <p style="font-size:14px;line-height:1.7;margin-bottom:10px"><strong style="color:var(--accent)">Scaling laws</strong>: as you add more parameters, data, and compute, a model's loss (its error rate on the training objective) decreases smoothly and predictably — you can plot it as a clean curve.</p>
+    <p style="font-size:14px;line-height:1.7"><strong style="color:var(--accent)">Emergent abilities</strong> are the strange exception: some capabilities — multi-step arithmetic, translating between low-resource languages, explaining a joke — don't appear gradually. Below a certain scale threshold the model simply cannot do the task at all; above it, performance jumps. You cannot predict emergent abilities by extrapolating the smooth loss curve — they show up as a genuine surprise, discovered only after training a bigger model and testing it.</p>
+  </div>
+
+  <div class="game-card" id="game1">
+    <div class="game-header" onclick="toggleGame('game1')">
+      <div class="game-header-left">
+        <span class="game-tag">In-Class Game</span>
+        <span class="game-title">Scale It Up</span>
+      </div>
+      <span class="game-toggle">▶</span>
+    </div>
+    <div class="game-body">
+      <span class="game-dur">⏱ 12 min · 8–10 volunteers form a growing line, rest of room votes</span>
+      <div class="game-primer">📈 Primer: a scaling law is a smooth, predictable curve — bigger model, gradually better. An emergent ability is different — a specific skill that is simply absent below a size threshold and suddenly present above it, not a gradual improvement. Today's game makes that "sudden jump" physical instead of abstract.</div>
+      <p class="game-desc">8–10 volunteers line up at the front, each holding a card with a parameter count (125M, 350M, 1.3B, 6B, 13B, 70B, 175B, 540B — smallest to largest). Trainer keeps a running "smooth loss curve" sketched on the whiteboard throughout, dropping a little with each new volunteer added — that part stays gradual on purpose.</p>
+      <ul class="game-steps">
+        <li>Trainer reveals one task per round (e.g. "explain why this joke is funny," "do 3-digit multiplication," "translate a proverb between two low-resource languages")</li>
+        <li>Starting from the smallest card, add one volunteer to the line at a time. At each size, the room shouts a guess: can a model this size do the task?</li>
+        <li>Below the threshold volunteer, that "model" gives a scripted blank/wrong non-answer (trainer preps this in advance per task) — no matter how much bigger it gets, still wrong, still wrong…</li>
+        <li>Then one specific volunteer (the threshold size, chosen in advance per task) suddenly performs the task correctly and confidently — a visible jump, not a gradual improvement</li>
+        <li>Point back at the whiteboard's smooth loss curve: it kept improving gradually the whole time, but the actual skill only appeared at one specific point</li>
+      </ul>
+      <div class="game-debrief">💡 Debrief: this is exactly why "just make it bigger" is a real strategy, not lazy engineering — some capabilities are only unlocked at scale, and nobody can fully predict which ones or exactly where, until someone trains the bigger model and tests it.</div>
+    </div>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A colleague says "a bigger foundation model is just a smoother, marginally better version of a smaller one." What's wrong with that claim?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">It's only half true. Loss/accuracy does improve smoothly with scale (the scaling law part) — but some specific abilities appear suddenly at a size threshold rather than gradually (emergent abilities). A model can be "10% bigger" and go from completely unable to do a task, to reliably able to do it — that's not a smooth improvement, it's a step change, and it's part of why model selection isn't just "pick the cheapest one that's big enough."</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S3 — TASK-SPECIFIC FOUNDATION MODELS ══════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-label">Unit 2</div>
+  <div class="section-title">Task-Specific Foundation Models</div>
+  <div class="section-sub">Not every foundation model does everything — and knowing the category tells you what to expect.</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Unimodal vs. Multimodal</h4>
+      <p style="font-size:14px;line-height:1.65"><strong style="color:var(--accent)">Unimodal</strong> — handles one type of input/output (text-only, or image-only). <strong style="color:var(--accent)">Multimodal</strong> — natively handles multiple types together (text + image + audio in a single conversation), e.g. describing a photo you upload, or reasoning over a PDF's charts and text at once.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Reasoning vs. Creativity</h4>
+      <p style="font-size:14px;line-height:1.65">Text/code models are generally optimised for <strong style="color:var(--accent)">reasoning</strong> — correctness, logic, following instructions precisely. Image/video/audio generation models are optimised for <strong style="color:var(--accent)">creativity</strong> — plausible, aesthetically strong output, where there's rarely one "correct" answer. Different objective, different evaluation, different model.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-label" style="margin-bottom:4px">Live Tool</div>
+    <h4 style="color:var(--white);margin-bottom:14px">Foundation Model Explorer — click a card to flip it</h4>
+    <div class="card-grid card-grid-4" id="fm-explorer" style="gap:14px"></div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Transformer vs. Diffusion — recap from Day 1</h4>
+    <table class="data-table">
+      <tr><th>Architecture</th><th>Best for</th><th>How it generates</th></tr>
+      <tr><td>Transformer</td><td>Text, code, structured reasoning</td><td>One token at a time, predicting the next most likely token</td></tr>
+      <tr><td>Diffusion</td><td>Images, video, audio</td><td>Starts from noise, removes it step by step until a coherent output remains</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S4 — INDUSTRY-SPECIFIC FOUNDATION MODELS ══════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-label">Unit 3</div>
+  <div class="section-title">Industry-Specific Foundation Models</div>
+  <div class="section-sub">General-purpose vs. Vertical AI — and why enterprises often pay for both.</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <p style="font-size:14px;line-height:1.7"><strong style="color:var(--accent)">General-purpose</strong> foundation models (GPT, Claude, Gemini) are broad by design — good at almost everything, expert at nothing specific. <strong style="color:var(--accent)">Vertical AI</strong> models are fine-tuned or built on proprietary, domain-specific data for one industry — narrower scope, but far higher reliability inside that domain, because the model has actually seen the terminology, edge cases, and regulatory language that matters there.</p>
+  </div>
+
+  <div class="card-grid card-grid-3" style="margin-bottom:20px">
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">💰</div><h4 style="color:var(--white);margin-bottom:6px">Finance</h4><p style="font-size:13px">Fraud detection, algorithmic research, regulatory filing analysis — trained on market and compliance data general models never see in depth.</p></div>
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">⚖️</div><h4 style="color:var(--white);margin-bottom:6px">Legal</h4><p style="font-size:13px">Contract review, case-law research — needs precise citation and jurisdiction awareness that a general model will confidently get wrong (see Day 1's hallucination unit).</p></div>
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">🏥</div><h4 style="color:var(--white);margin-bottom:6px">Healthcare</h4><p style="font-size:13px">Radiology image analysis, clinical note summarisation — highest-stakes domain, heaviest regulatory and explainability requirements (previews Day 4).</p></div>
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">🏭</div><h4 style="color:var(--white);margin-bottom:6px">Manufacturing</h4><p style="font-size:13px">Defect detection from camera feeds, predictive maintenance from sensor data — Samsung's own production lines use models like this today.</p></div>
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">🔬</div><h4 style="color:var(--white);margin-bottom:6px">Science</h4><p style="font-size:13px">Research acceleration, protein-structure prediction (e.g. AlphaFold) — models trained on domain data no general web-scrape ever included.</p></div>
+    <div class="card"><div style="font-size:22px;margin-bottom:6px">🏢</div><h4 style="color:var(--white);margin-bottom:6px">Enterprise-specific</h4><p style="font-size:13px">A company's own internal model, fine-tuned on its own proprietary documents — the most specific tier, and the most expensive to build and maintain.</p></div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Domain adaptation — how a general model becomes a vertical one</h4>
+    <p style="font-size:14px;line-height:1.7">Start from a strong general-purpose foundation model, then fine-tune it on a curated, proprietary dataset from the target domain (anonymised patient notes, internal legal precedent, historical fraud cases). The base model's broad language ability is retained; the fine-tuning teaches it the domain's specific vocabulary, edge cases, and correct-answer patterns.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S5 — FOUNDATION MODEL ARCHITECTURE ══════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-label">Unit 4</div>
+  <div class="section-title">Foundation Model Architecture</div>
+  <div class="section-sub">Transformer and diffusion internals, recapped through the lens of scale.</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Attention, at a high level</h4>
+      <p style="font-size:14px;line-height:1.65">Every token in a prompt can "look at" every other token and weigh how relevant it is before producing the next word — this is what lets a model connect "it" on page 3 back to a noun on page 1. More parameters generally means more attention heads, watching for more distinct kinds of relationships at once.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Context Window</h4>
+      <p style="font-size:14px;line-height:1.65">The maximum amount of text (measured in tokens) a model can "see" at once — prompt plus conversation history plus any attached documents. Runs out mid-conversation and the model literally cannot see the earliest messages anymore, regardless of how relevant they were.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-label" style="margin-bottom:4px">Live Tool</div>
+    <h4 style="color:var(--white);margin-bottom:14px">Model Scale Slider</h4>
+    <input type="range" id="scale-slider" min="0" max="7" value="0" step="1" style="width:100%" oninput="updateScale(this.value)">
+    <div class="selector-result" id="scale-result" style="margin-top:14px"></div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Inference vs. Training</h4>
+    <table class="data-table">
+      <tr><th></th><th>Training</th><th>Inference</th></tr>
+      <tr><td>What happens</td><td>Model learns weights from data — one-time (or periodic), extremely expensive</td><td>Model uses its already-learned weights to answer a single prompt — happens every API call</td></tr>
+      <tr><td>Who pays for it</td><td>The model provider (OpenAI, Anthropic, Google…)</td><td>You — every prompt/response is metered and billed (or run locally, like this program's Ollama tools)</td></tr>
+      <tr><td>Cost driver</td><td>Total parameters × total training data × compute time</td><td>Input + output tokens × price per token for the model chosen</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- AhaSlides #1 — roughly 50% content mark -->
+<div class="quiz-marker fade-in">
+  <span class="quiz-icon">📊</span>
+  <div>
+    <div class="quiz-title">AhaSlides — Checkpoint #1 · After Foundation Model Architecture</div>
+    <div class="quiz-desc">Covers Units 1–4: what a foundation model is, emergent abilities, task-specific vs industry-specific models, architecture basics · questions in ahaquizday3.md</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ S6 — OPEN VS CLOSED ══════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-label">Unit 5</div>
+  <div class="section-title">Open Source vs. Closed Models</div>
+  <div class="section-sub">Neither side wins every scenario — that's the actual lesson.</div>
+
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" onclick="showOC('open')" id="oc-btn-open">Open-Weight</button>
+    <button class="toggle-btn" onclick="showOC('closed')" id="oc-btn-closed">Closed / Proprietary</button>
+  </div>
+  <div class="card" id="oc-panel" style="margin-bottom:20px"></div>
+
+  <div class="game-card" id="game2">
+    <div class="game-header" onclick="toggleGame('game2')">
+      <div class="game-header-left">
+        <span class="game-tag">In-Class Game</span>
+        <span class="game-title">Pick a Side</span>
+      </div>
+      <span class="game-toggle">▶</span>
+    </div>
+    <div class="game-body">
+      <span class="game-dur">⏱ 12 min · Room splits in half, debate format</span>
+      <div class="game-primer">⚖️ Primer: open-weight models (Llama, Mistral) can be downloaded, self-hosted, and fully customised — nothing leaves your servers. Closed models (GPT, Claude, Gemini) are accessed only via API — you don't see or control the weights, but you get the provider's latest capability with zero infrastructure to manage. Neither is universally "better" — it depends on the scenario.</div>
+      <p class="game-desc">Split the room down the middle: left half argues for Open-Weight, right half argues for Closed/Proprietary — no matter their personal opinion, they must argue their assigned side. Trainer reads one business scenario per round.</p>
+      <ul class="game-steps">
+        <li>Trainer reads a scenario aloud (e.g. "A hospital wants AI reading X-rays, but patient data legally cannot leave the building")</li>
+        <li>Each side gets 30 seconds to shout out their single strongest argument for that specific scenario</li>
+        <li>Room (both sides together) votes by show of hands on which side had the stronger case — <em>for this scenario only</em></li>
+        <li>Repeat with 2–3 more scenarios, deliberately chosen so the "winning" side flips each time (e.g. next: "A startup needs the best possible coding assistant today, has no infra team, and speed to market matters more than anything")</li>
+      </ul>
+      <div class="game-debrief">💡 Debrief: point out that the winning side changed every round — that flip <em>is</em> the lesson. "Open vs. closed" isn't a contest with a permanent winner; it's a trade-off you re-evaluate per use case, which is exactly what Section 9's Model Selection Strategy formalises.</div>
+    </div>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A startup's CTO says "we should always use open-weight models — they're free and we can self-host." What's the flaw in "always"?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">Self-hosting is only "free" if you ignore GPU infrastructure, ops staff, and the engineering time to keep pace with closed-model providers' constant capability upgrades. For a small team without infra expertise that needs the current best-in-class reasoning fast, a closed API is often actually cheaper and faster to ship with — "always" is the tell that this is a rule-of-thumb being applied without checking the actual scenario.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S7 — LEADING FOUNDATION MODELS ══════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-label">Unit 6</div>
+  <div class="section-title">Leading Foundation Models</div>
+  <div class="section-sub">Text, code, image, video, audio — the current landscape by primary strength.</div>
+  <div class="card-grid card-grid-4" id="leading-models" style="gap:14px"></div>
+</section>
+
+<!-- ══════════════════════════ S8 — AI PLATFORMS ══════════════════════════ -->
+<section class="section" id="s8">
+  <div class="section-label">Unit 7</div>
+  <div class="section-title">AI Platforms</div>
+  <div class="section-sub">The model is only half the decision — where and how you access it is the other half.</div>
+
+  <div class="toggle-wrap" id="platform-tabs"></div>
+  <div class="card" id="platform-panel"></div>
+</section>
+
+<!-- ══════════════════════════ S9 — MODEL SELECTION STRATEGY ══════════════════════════ -->
+<section class="section" id="s9">
+  <div class="section-label">Unit 8</div>
+  <div class="section-title">Model Selection Strategy</div>
+  <div class="section-sub">Pick your priorities — see what that actually implies about the right model class.</div>
+
+  <div class="card">
+    <div class="section-label" style="margin-bottom:4px">Live Tool</div>
+    <h4 style="color:var(--white);margin-bottom:14px">Model Selector — click every priority that applies</h4>
+    <div id="priority-chips"></div>
+    <div class="selector-result" id="selector-result" style="margin-top:16px">Select at least one priority above to see guidance.</div>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A startup building an MVP and a regulated bank rebuilding its core codebase both need a coding assistant. Should they pick the same model?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">Almost certainly not. The startup optimises for speed and cost — a fast, cheap closed API is likely the right call. The bank optimises for security, auditability, and compliance — it may need an on-prem or private-cloud deployment, tighter data controls, and a model whose behaviour can be logged and explained to a regulator. Same task category (coding), completely different constraint set, completely different right answer.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S10 — ENTERPRISE CONSIDERATIONS ══════════════════════════ -->
+<section class="section" id="s10">
+  <div class="section-label">Unit 9</div>
+  <div class="section-title">Enterprise Considerations</div>
+  <div class="section-sub">What changes once a model moves from "cool demo" to "production system."</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Security &amp; Governance</h4>
+      <p style="font-size:14px;line-height:1.65">Who can call the model, with what data, and who reviews the output before it reaches a customer? Enterprise deployments need access controls and audit trails, not just an API key shared in a chat.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Compliance &amp; Deployment Choice</h4>
+      <p style="font-size:14px;line-height:1.65">Regulated industries (finance, healthcare) often can't use a public cloud API at all — deployment choice (cloud vs. private cloud vs. fully on-prem) is frequently decided by legal/compliance before any model-quality comparison even starts.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Domain Adaptation</h4>
+      <p style="font-size:14px;line-height:1.65">Same idea as Unit 3's vertical AI, but as an ongoing enterprise process — continuously fine-tuning on the company's own proprietary data as it accumulates, not a one-time setup step.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Responsible AI &amp; Model Evaluation</h4>
+      <p style="font-size:14px;line-height:1.65">Before any model ships, enterprises run structured evaluation — accuracy benchmarks, bias testing, hallucination rate checks. This is exactly what Lab 1 (Interrogation Room) has you do by hand, at a much smaller scale, today.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">The full picture — connecting today back to Day 1 and forward to Day 4</h4>
+    <p style="font-size:14px;line-height:1.7">Day 1 showed you a model can hallucinate. Today showed you <em>why</em> — every model has a training cutoff, a scale, and blind spots, and different models trade these off differently. Day 4 goes further: the governance, bias, and risk-management frameworks enterprises build specifically because of what you're about to test yourself in Lab 1.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S11 — PRACTICE QUIZ (self-test, unscored) ══════════════════════════ -->
+<section class="section" id="s11" style="align-items:center">
+  <div class="section-label">Optional · Not Scored · Not AhaSlides</div>
+  <div class="section-title">Practice Quiz</div>
+  <div class="section-sub">Self-test only — for your own confidence check, not graded, not the real AhaSlides checkpoints.</div>
+  <div class="quiz-progress" id="quiz-progress" style="max-width:600px;width:100%"></div>
+  <div id="quiz-body" style="max-width:600px;width:100%"></div>
+</section>
+
+<!-- ══════════════════════════ LABS ══════════════════════════ -->
+<section class="section" id="labs" style="align-items:stretch;min-height:auto;padding-top:64px">
+  <div class="section-label">Today's Labs</div>
+  <div class="section-title">Your Mission Today</div>
+  <div class="section-sub">2 labs · One combined submission at the end of the day</div>
+
+  <div class="ach-grid fade-in">
+    <div class="ach-card"><div class="ach-icon">🥈</div><div class="ach-name">Silver</div><div class="ach-desc">Submitted — name + both labs' core fields filled</div></div>
+    <div class="ach-card"><div class="ach-icon">🥇</div><div class="ach-name">Gold</div><div class="ach-desc">Silver + ≥80% of today's tasks + Guardrail Battle ≥5/8 blocked</div></div>
+    <div class="ach-card"><div class="ach-icon">💎</div><div class="ach-name">Diamond</div><div class="ach-desc">Gold + 100% tasks + Guardrail Battle ≥7/8 blocked + stretch task done</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px;border-color:var(--accent)40">
+    <p style="font-size:14px;color:var(--text)"><strong style="color:var(--accent)">No submission = no medal</strong> (blank/grey on the dashboard). Note: today's Gold/Diamond thresholds are keyed to your actual Guardrail Battle score, not just task completion — that score is computed automatically from what the model actually does, not self-reported, so it's the one part of today you can't "complete" without really doing it. Full step-by-step instructions are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day3readme.md</code>.</p>
+  </div>
+
+  <div class="lab-card fade-in">
+    <span class="lab-badge">Lab 1 · AM · Individual · Scored</span>
+    <h3>🔍 AI Interrogation Room</h3>
+    <p class="lab-role">Role: Junior AI Quality Analyst, Samsung AI CoE</p>
+    <p class="desc">A 30-minute live walkthrough first — your trainer fires a hallucination trap, runs a bias probe, and shows a guardrail block-then-bypass on the projector. Then it's your laptop: run all 4 modules yourself, ending with the Guardrail Battle (8 adversarial attacks, increasing difficulty) against a guardrail you write and iterate on yourself.</p>
+    <ul class="lab-tasks">
+      <li>Hallucination Lab — fire at least 1 pre-planted trap, see it confidently guess wrong, then fix it with grounding</li>
+      <li>Bias Probe — run at least 1 probe, compare Run A vs. Run B output side by side</li>
+      <li>Guardrail Builder — write your own system prompt, test it against a dangerous request</li>
+      <li>Guardrail Battle — complete all 8 attacks; rewrite and re-test your guardrail to push your blocked score up</li>
+      <li>Open <strong>📤 My Results</strong> in the app and copy your numbers into Lab 2's Interrogation Room Recap</li>
+    </ul>
+    <span class="stretch-note">Stretch: design and run your own additional attack in Free Input / Guardrail Battle that isn't in the pre-built set, and note whether your guardrail caught it</span>
+    <a href="lab/lab1.html" class="lab-link">Open Lab 1 — AI Interrogation Room →</a>
+  </div>
+
+  <!-- AhaSlides #2 -->
+  <div class="quiz-marker fade-in">
+    <span class="quiz-icon">📊</span>
+    <div>
+      <div class="quiz-title">AhaSlides — Checkpoint #2 · Between Lab 1 and Lab 2</div>
+      <div class="quiz-desc">Quick check on hallucination/bias/guardrails before moving to RAG · questions in ahaquizday3.md</div>
+    </div>
+  </div>
+
+  <div class="lab-card fade-in">
+    <span class="lab-badge">Lab 2 · PM · Individual · Scored</span>
+    <h3>📚 RAG vs. No-RAG Showdown</h3>
+    <p class="desc">Ask the same question twice — once with no supporting context (the model must guess from memory), once with the correct document pasted directly into the prompt (Retrieval-Augmented Generation, done by hand). See directly why grounding fixes what Lab 1 just showed you going wrong.</p>
+    <ul class="lab-tasks">
+      <li>Pick 1 of 3 Samsung scenarios, run the No-RAG version, record the answer</li>
+      <li>Run the RAG version (same question, provided document pasted into the prompt), record the answer</li>
+      <li>Judge: did grounding fix a wrong answer, confirm a right one, or make no difference? All 3 outcomes are valid findings</li>
+      <li>Fill in the Interrogation Room Recap section (from Lab 1's 📤 My Results) and the combined submission generator, download <code style="background:#090D18;padding:1px 5px;border-radius:4px;color:var(--accent)">day3.json</code></li>
+    </ul>
+    <span class="stretch-note">Stretch: find or construct a case where the provided document conflicts with what the model "already knew" — which one wins, and why does that matter for enterprise RAG systems?</span>
+    <a href="lab/lab2.html" class="lab-link">Open Lab 2 — RAG vs. No-RAG Showdown →</a>
+  </div>
+
+  <div class="card fade-in">
+    <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px">Submitting — one file, generated for you</div>
+    <p style="font-size:14px;color:var(--text);margin-bottom:10px">Lab 2's page has a form covering both Lab 1 (Interrogation Room Recap) and Lab 2 (RAG Showdown) fields. Fill it in, click <strong style="color:var(--white)">Generate &amp; Download day3.json</strong> — your browser saves the file correctly named and typed, no Notepad editing needed. Move it into your <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">submissions</code> folder, then push once. Full steps are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day3readme.md</code>.</p>
+    <div class="code-block">git add submissions/day3.json<br>git commit -m "Day 3 submission - YOUR NAME"<br>git push origin main</div>
+  </div>
+</section>
+
+<!-- AhaSlides #3 — end of day -->
+<div class="quiz-marker fade-in">
+  <span class="quiz-icon">📊</span>
+  <div>
+    <div class="quiz-title">AhaSlides — Checkpoint #3 · End of day</div>
+    <div class="quiz-desc">Lightning recap · full day coverage · tomorrow preview: AI Ethics and Responsibility · questions in ahaquizday3.md</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// FOUNDATION MODEL EXPLORER (S3)
+// ═══════════════════════════════════════════════════════════════
+const FM_CARDS = [
+  {icon:"💬",name:"GPT family",back:"OpenAI · text/reasoning · broad ecosystem, strong general-purpose baseline across almost every task."},
+  {icon:"📖",name:"Claude",back:"Anthropic · text/reasoning · very long context, strong coding, safety-focused design (this program's trainer default)."},
+  {icon:"✨",name:"Gemini",back:"Google · natively multimodal · deep integration with Google Workspace and Search."},
+  {icon:"🦙",name:"Llama",back:"Meta · open-weight · downloadable, self-hostable, fully customisable — no vendor API required."},
+  {icon:"🌬️",name:"Mistral",back:"Mistral AI · open-weight · efficient, strong performance-per-parameter, popular for on-prem/edge deployment."},
+  {icon:"🎨",name:"Stable Diffusion",back:"Stability AI · open-weight image generation · customisable, self-hostable, the base for many fine-tuned art models."},
+  {icon:"🖼️",name:"Midjourney",back:"Midjourney · image generation · widely regarded as the highest aesthetic-quality output, Discord-based workflow."},
+  {icon:"🎭",name:"DALL·E",back:"OpenAI · image generation · built directly into ChatGPT, strong at following detailed text instructions precisely."},
+  {icon:"🎬",name:"Sora",back:"OpenAI · text-to-video · generates short coherent video clips directly from a text description."},
+  {icon:"🎞️",name:"Runway",back:"Runway · video generation &amp; editing · creative-industry-focused tools, video-to-video editing."},
+  {icon:"🎙️",name:"ElevenLabs",back:"ElevenLabs · voice synthesis &amp; cloning · realistic speech generation, widely used for dubbing and narration."},
+  {icon:"🎵",name:"Suno",back:"Suno · music generation · full songs (lyrics + vocals + instrumentation) from a text prompt."},
+];
+function renderFMExplorer(){
+  document.getElementById('fm-explorer').innerHTML = FM_CARDS.map((m,i)=>`
+    <div class="flip-card" id="fm-${i}" onclick="document.getElementById('fm-${i}').classList.toggle('flipped')" style="height:190px">
+      <div class="flip-inner" style="height:190px">
+        <div class="flip-front"><div style="font-size:30px;margin-bottom:8px">${m.icon}</div><div style="font-weight:700;color:var(--white);font-size:14px">${m.name}</div><div style="font-size:11px;color:var(--dim);margin-top:6px">Click to flip</div></div>
+        <div class="flip-back"><div style="font-weight:700;color:var(--accent);font-size:13px;margin-bottom:6px">${m.name}</div><div style="font-size:12.5px;color:var(--text);line-height:1.55">${m.back}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LEADING MODELS GRID (S7) — reuse same card data, no flip needed here
+// ═══════════════════════════════════════════════════════════════
+function renderLeadingModels(){
+  document.getElementById('leading-models').innerHTML = FM_CARDS.map(m=>`
+    <div class="card" style="text-align:center">
+      <div style="font-size:26px;margin-bottom:8px">${m.icon}</div>
+      <div style="font-weight:700;color:var(--white);font-size:14px;margin-bottom:6px">${m.name}</div>
+      <div style="font-size:12px;color:var(--text);line-height:1.5">${m.back}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// OPEN VS CLOSED TOGGLE (S6)
+// ═══════════════════════════════════════════════════════════════
+const OC_PANELS = {
+  open: {label:"Open-Weight Models (Llama, Mistral, Stable Diffusion…)", pros:["Full control — download, inspect, self-host, fine-tune however you want","No per-token API cost once running — just infrastructure cost","Data never leaves your own servers — strong for privacy/compliance","Fully customisable for a narrow domain via your own fine-tuning"], cons:["You own the ops burden — GPUs, uptime, scaling, security patching","Usually trails the very best closed models on cutting-edge reasoning benchmarks","No vendor support line when something breaks"]},
+  closed: {label:"Closed / Proprietary Models (GPT, Claude, Gemini…)", pros:["Access to the provider's latest, usually best-in-class capability","Zero infrastructure to manage — an API key and you're live","Continuously improved by the provider with no effort on your side"], cons:["Data leaves your servers (unless a private/enterprise deployment tier is used)","Ongoing per-token cost that scales with usage — no ceiling","You don't control the model — a provider update can silently change its behaviour"]},
+};
+function showOC(which){
+  document.getElementById('oc-btn-open').classList.toggle('active', which==='open');
+  document.getElementById('oc-btn-closed').classList.toggle('active', which==='closed');
+  const d = OC_PANELS[which];
+  document.getElementById('oc-panel').innerHTML = `
+    <h4 style="color:var(--white);margin-bottom:12px">${d.label}</h4>
+    <div style="font-size:12.5px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Strengths</div>
+    <ul style="padding-left:20px;font-size:14px;line-height:1.8;margin-bottom:14px">${d.pros.map(p=>`<li>${p}</li>`).join('')}</ul>
+    <div style="font-size:12.5px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Trade-offs</div>
+    <ul style="padding-left:20px;font-size:14px;line-height:1.8">${d.cons.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// AI PLATFORMS TABS (S8)
+// ═══════════════════════════════════════════════════════════════
+const PLATFORMS = [
+  {key:"openai", label:"OpenAI Platform", desc:"Direct API access to GPT, DALL·E, and Sora. Developer-first, the reference platform most tutorials are written against."},
+  {key:"google", label:"Google AI Studio / Vertex AI", desc:"Gemini access, from a free quick-start (AI Studio) up to full enterprise MLOps and deployment pipelines (Vertex AI) on GCP."},
+  {key:"anthropic", label:"Anthropic (Claude)", desc:"Claude API and Console access — enterprise safety focus, very long context windows, strong on coding and careful reasoning."},
+  {key:"hf", label:"Hugging Face", desc:"The open-model hub — thousands of open-weight models, datasets, and one-click hosting (Inference Endpoints) for self-serve deployment."},
+  {key:"azure", label:"Azure AI", desc:"Enterprise-grade access to OpenAI's models plus deep Microsoft ecosystem integration (Office, Teams, enterprise identity/security)."},
+  {key:"bedrock", label:"AWS Bedrock", desc:"Multi-vendor access (Claude, Llama, and others) inside AWS's own security, billing, and infrastructure boundary — one platform, several model choices."},
+  {key:"nvidia", label:"NVIDIA (NIM / AI Enterprise)", desc:"Focused on inference optimisation and on-prem / GPU-heavy deployment — the platform of choice when the model must run on your own hardware."},
+];
+function renderPlatformTabs(){
+  document.getElementById('platform-tabs').innerHTML = PLATFORMS.map((p,i)=>`<button class="toggle-btn ${i===0?'active':''}" id="plat-btn-${p.key}" onclick="showPlatform('${p.key}')">${p.label}</button>`).join('');
+  showPlatform(PLATFORMS[0].key);
+}
+function showPlatform(key){
+  PLATFORMS.forEach(p=>document.getElementById('plat-btn-'+p.key).classList.toggle('active', p.key===key));
+  const d = PLATFORMS.find(p=>p.key===key);
+  document.getElementById('platform-panel').innerHTML = `<h4 style="color:var(--white);margin-bottom:10px">${d.label}</h4><p style="font-size:14.5px;line-height:1.7">${d.desc}</p>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODEL SCALE SLIDER (S5)
+// ═══════════════════════════════════════════════════════════════
+const SCALE_STEPS = [
+  {params:"125M", note:"Toy scale. Runs on a phone. Basic pattern completion only — no real reasoning, no reliable factual recall."},
+  {params:"350M", note:"Small edge/on-device scale. Fast and free to run, but shallow reasoning — fine for classification, weak for open-ended tasks."},
+  {params:"1.3B", note:"Entry hobbyist-laptop scale (this program's local Ollama tools use models near here, e.g. llama3.2:1b) — usable chat, still shaky on multi-step logic."},
+  {params:"6B", note:"Noticeably better instruction-following. Still not reliable on genuinely hard multi-step reasoning."},
+  {params:"13B", note:"Solid general-purpose local model — good chat quality, workable coding help, needs a real GPU to run fast."},
+  {params:"70B", note:"Near frontier-model quality on many benchmarks. Requires serious infrastructure (multi-GPU) to self-host at usable speed."},
+  {params:"175B", note:"Original GPT-3-class scale. Frontier reasoning on release, now roughly mid-tier as newer techniques close the gap without needing raw size."},
+  {params:"540B+", note:"Largest publicly-discussed dense/sparse scales. Diminishing returns are real here — capability gains per added parameter shrink, which is why smaller, better-trained models increasingly compete with brute scale."},
+];
+function updateScale(idx){
+  const s = SCALE_STEPS[idx];
+  document.getElementById('scale-result').innerHTML = `<strong style="color:var(--accent);font-size:16px">${s.params} parameters</strong><br><br>${s.note}`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MODEL SELECTOR (S9)
+// ═══════════════════════════════════════════════════════════════
+const PRIORITIES = [
+  {key:"accuracy", label:"Accuracy / Reasoning"},
+  {key:"cost", label:"Cost"},
+  {key:"latency", label:"Latency (speed)"},
+  {key:"multimodal", label:"Multimodal"},
+  {key:"coding", label:"Coding ability"},
+  {key:"privacy", label:"Privacy / on-prem"},
+];
+const PRIORITY_GUIDANCE = {
+  accuracy: "Lean toward the current frontier closed models (GPT, Claude, Gemini top tiers) — they generally lead reasoning benchmarks, at a higher per-token cost.",
+  cost: "Consider smaller or open-weight models — a 7-13B open model self-hosted, or a provider's smaller/cheaper tier, cuts cost sharply for simpler tasks.",
+  latency: "Smaller models (or a provider's fast/mini tier) respond quicker — don't default to the biggest model if the task doesn't need it.",
+  multimodal: "Narrow to natively multimodal models (Gemini, GPT-4o-class) rather than a text-only model bolted to a separate image tool.",
+  coding: "Claude and GPT's coding-focused tiers are consistently strong here; for fully private codebases, consider a self-hosted open-weight coding model instead.",
+  privacy: "Push toward open-weight self-hosted, or a provider's private/enterprise deployment tier — public shared APIs are the wrong default when data can't leave the building.",
+};
+let activePriorities = new Set();
+function renderPriorityChips(){
+  document.getElementById('priority-chips').innerHTML = PRIORITIES.map(p=>`<span class="priority-chip" id="chip-${p.key}" onclick="togglePriority('${p.key}')">${p.label}</span>`).join('');
+}
+function togglePriority(key){
+  if(activePriorities.has(key)) activePriorities.delete(key); else activePriorities.add(key);
+  document.getElementById('chip-'+key).classList.toggle('active');
+  updateSelectorResult();
+}
+function updateSelectorResult(){
+  const el = document.getElementById('selector-result');
+  if(activePriorities.size===0){ el.textContent = "Select at least one priority above to see guidance."; return; }
+  el.innerHTML = Array.from(activePriorities).map(k=>`<strong style="color:var(--accent)">${PRIORITIES.find(p=>p.key===k).label}:</strong> ${PRIORITY_GUIDANCE[k]}`).join('<br><br>');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRACTICE QUIZ (self-test, not scored, not AhaSlides)
+// Word-count rule applied from the start: correct answer never the longest option.
+// ═══════════════════════════════════════════════════════════════
+const QUIZ_QS = [
+  {q:"What makes a model a 'foundation model' rather than a narrow task-specific model?", opts:["Trained broadly, then adaptable to many downstream tasks","It only works on one single fixed task forever","It must always be open-weight and self-hosted","It is always smaller than 1 billion parameters"], ans:0},
+  {q:"Scaling laws describe:", opts:["Smooth, predictable improvement as scale increases","Only how much a model costs to license","A fixed schedule for releasing new models","The number of GPUs needed to run any model"], ans:0},
+  {q:"An 'emergent ability' is best described as:", opts:["A skill that appears suddenly past a size threshold","Any skill a model has from its very first training step","A bug introduced only in the largest models","A feature only closed models are allowed to have"], ans:0},
+  {q:"A multimodal foundation model is one that:", opts:["Natively handles more than one input/output type together","Can only be accessed through multiple different apps","Requires multiple separate API keys to use","Was trained using multiple unrelated companies' data"], ans:0},
+  {q:"Why might a hospital prefer an open-weight, self-hosted model over a closed API?", opts:["Patient data can stay fully inside their own servers","Open-weight models are always more accurate","Closed APIs cannot process medical images at all","Self-hosting requires no infrastructure investment"], ans:0},
+  {q:"What is the main trade-off enterprises accept when choosing a closed/proprietary model?", opts:["Less control over the model, in exchange for less ops burden","Guaranteed lower cost at any usage volume","No need to ever verify the model's outputs","Permanent access to the model's raw weights"], ans:0},
+  {q:"A context window limit means:", opts:["The model can only 'see' a limited amount of text at once","The model can only be used during business hours","The model's vocabulary is capped at a fixed word list","The model cannot process more than one language"], ans:0},
+  {q:"Domain adaptation for a vertical AI model typically involves:", opts:["Fine-tuning a general foundation model on domain-specific data","Deleting all of the base model's general knowledge first","Running the model on specialised hardware only","Renaming the model to match the industry"], ans:0},
+  {q:"When picking a model, prioritising 'privacy' most strongly points toward:", opts:["An on-prem or self-hosted deployment option","Always choosing the single most accurate model","Ignoring where the data is actually processed","Using whichever model is cheapest per token"], ans:0},
+  {q:"Why did today's RAG lab pair naturally with the Interrogation Room lab?", opts:["Grounding with real context is the direct fix for the hallucinations Lab 1 exposed","RAG and hallucination detection are completely unrelated topics","RAG replaces the need to ever test a model at all","RAG only works on image-generation models, like Lab 1's traps"], ans:0},
+];
+let quizIdx=0, quizScore=0, quizAnswered=false, quizTimer=null;
+function initQuiz(){ renderQuizQuestion(0); renderQuizProgress(); }
+function renderQuizProgress(){
+  document.getElementById('quiz-progress').innerHTML=QUIZ_QS.map((_,i)=>`<div class="quiz-prog-dot ${i<quizIdx?'done':i===quizIdx?'current':''}"></div>`).join('');
+}
+function renderQuizQuestion(idx){
+  if(idx>=QUIZ_QS.length){showQuizEnd();return}
+  const q=QUIZ_QS[idx];
+  quizAnswered=false;
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span class="badge badge-accent">Q${idx+1} of ${QUIZ_QS.length}</span>
+        <span id="quiz-timer" style="font-size:16px;font-weight:700;color:var(--warn)">30</span>
+      </div>
+      <div class="quiz-q">${q.q}</div>
+      ${q.opts.map((o,i)=>`<div class="quiz-opt" id="qopt-${i}" onclick="selectAnswer(${i})">${String.fromCharCode(65+i)}) ${o}</div>`).join('')}
+    </div>`;
+  startQuizTimer();
+}
+function startQuizTimer(){
+  let t=30;
+  clearInterval(quizTimer);
+  quizTimer=setInterval(()=>{
+    t--;
+    const el=document.getElementById('quiz-timer');
+    if(el)el.textContent=t;
+    if(t<=0){clearInterval(quizTimer);if(!quizAnswered)selectAnswer(-1);}
+  },1000);
+}
+function selectAnswer(chosen){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  clearInterval(quizTimer);
+  const correct=QUIZ_QS[quizIdx].ans;
+  if(chosen===correct){quizScore++;document.getElementById('qopt-'+chosen).classList.add('correct','disabled');}
+  else{
+    if(chosen>=0)document.getElementById('qopt-'+chosen).classList.add('wrong','disabled');
+    document.getElementById('qopt-'+correct).classList.add('correct');
+  }
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.classList.add('disabled'));
+  setTimeout(()=>{quizIdx++;renderQuizProgress();renderQuizQuestion(quizIdx);},1800);
+}
+function showQuizEnd(){
+  const pct=Math.round(quizScore/QUIZ_QS.length*100);
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="card" style="text-align:center">
+      <div class="score-ring"><div class="score-num">${quizScore}</div><div class="score-total">/ ${QUIZ_QS.length}</div></div>
+      <div style="font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px">${pct>=80?'🏆 Outstanding!':pct>=60?'👏 Good work!':'📚 Keep learning!'}</div>
+      <div style="font-size:16px;color:var(--dim);margin-bottom:24px">Score: ${pct}% · ${pct>=80?'Top performer!':pct>=60?'Above average':'Review the concepts'}</div>
+      <button class="btn btn-primary" onclick="restartQuiz()">Retake Quiz</button>
+    </div>`;
+  if(pct>=80)launchConfetti();
+}
+function restartQuiz(){quizIdx=0;quizScore=0;renderQuizProgress();renderQuizQuestion(0);}
+function launchConfetti(){
+  const cols=['#00D4AA','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#10B981'];
+  for(let i=0;i<80;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${cols[i%cols.length]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation:fall ${2+Math.random()*2}s linear ${Math.random()*0.5}s forwards`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function toggleGame(id){ document.getElementById(id).classList.toggle('open'); }
+function toggleGameAnswer(li){ li.classList.toggle('revealed'); }
+function toggleCheck(btn){
+  const ans = btn.nextElementSibling;
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? 'Hide answer ↑' : 'Reveal answer ↓';
+}
+function toggleAcc(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+function initNav(){
+  const pills = document.querySelectorAll('.nav-pill');
+  const sections = document.querySelectorAll('.section');
+  const prog = document.getElementById('nav-prog');
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id = e.target.id;
+        pills.forEach(p=>p.classList.toggle('active',p.getAttribute('href')==='#'+id));
+        const idx = Array.from(sections).findIndex(s=>s.id===id);
+        prog.textContent = `Section ${idx+1} / ${sections.length}`;
+      }
+    });
+  },{threshold:0.4});
+  sections.forEach(s=>obs.observe(s));
+}
+
+function init(){
+  initNav();
+  renderFMExplorer();
+  renderLeadingModels();
+  showOC('open');
+  renderPlatformTabs();
+  updateScale(0);
+  renderPriorityChips();
+  initQuiz();
+}
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

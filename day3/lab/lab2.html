@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 3 — Lab 2: RAG vs. No-RAG Showdown | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0F2E; color: #F8FAFF; font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+#prog { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #00D4AA, #1428A0); z-index: 999; width: 0%; transition: width 0.4s; }
+
+header {
+  background: #0D1335; border-bottom: 1px solid #1E2A5E;
+  padding: 14px 32px; display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+}
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #00D4AA; }
+.day-badge { background: #1428A0; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.lab-badge { background: rgba(0,212,170,0.15); color: #00D4AA; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0,212,170,0.25); }
+
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.subtitle { color: #7A8FA6; font-size: 14px; margin-bottom: 28px; }
+
+.card { background: #111830; border: 1px solid #1E2A5E; border-radius: 14px; padding: 22px 24px; margin-bottom: 20px; }
+.card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.card p, .card li { font-size: 13.5px; color: #A0B0C8; line-height: 1.7; }
+
+/* Scenario cards */
+.scenario-card { background: #111830; border: 2px solid #1E2A5E; border-radius: 14px; margin-bottom: 14px; overflow: hidden; cursor: pointer; transition: border-color .2s; }
+.scenario-card:hover { border-color: #00D4AA80; }
+.scenario-card.selected { border-color: #00D4AA; }
+.scenario-header { padding: 18px 24px; display: flex; align-items: center; gap: 14px; }
+.scenario-num { width: 36px; height: 36px; border-radius: 10px; background: #1428A0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+.scenario-title-wrap { flex: 1; }
+.scenario-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+.scenario-tag { font-size: 11px; color: #7A8FA6; margin-top: 2px; }
+.scenario-check { font-size: 20px; color: #1E2A5E; }
+.scenario-card.selected .scenario-check { color: #00D4AA; }
+.scenario-body { display: none; padding: 0 24px 22px; cursor: default; }
+.scenario-card.selected .scenario-body { display: block; }
+
+.doc-box { background: #0D1B3E; border: 1px solid #1E3070; border-radius: 10px; padding: 14px 16px; margin: 10px 0 14px; }
+.doc-label { font-size: 10px; font-weight: 700; color: #3A6BC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.doc-text { font-size: 13.5px; line-height: 1.7; color: #C8D8F0; white-space: pre-wrap; position: relative; }
+.copy-btn { position: absolute; top: -4px; right: -4px; background: #1428A0; color: #fff; border: none; padding: 5px 12px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; }
+.copy-btn.copied { background: #00A882; }
+
+.link-btn { display: inline-block; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 600; margin-right: 8px; margin-bottom: 10px; color: #fff; background: #1428A0; }
+.link-btn:hover { opacity: .85; }
+
+.field-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00D4AA; margin: 12px 0 6px; display: block; }
+textarea, input[type=text], input[type=number], select {
+  width: 100%; background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 10px 12px; color: #F8FAFF; font-size: 13px; font-family: 'Inter', sans-serif; resize: vertical;
+}
+textarea:focus, input:focus, select:focus { outline: none; border-color: #00D4AA; }
+
+.radio-row { display: flex; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
+.radio-row label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #A0B0C8; cursor: pointer; }
+.radio-row input { accent-color: #00D4AA; }
+
+.info-box { background: #0D1B3E; border-left: 3px solid #1428A0; border-radius: 0 8px 8px 0; padding: 12px 16px; margin: 10px 0 14px; font-size: 13px; color: #A0B0C8; line-height: 1.7; }
+.info-box strong { color: #F8FAFF; }
+.info-box.warn { border-left-color: #FFD700; background: rgba(255,215,0,0.04); }
+code { font-family: 'IBM Plex Mono', monospace; background: #1E2A5E; padding: 2px 7px; border-radius: 4px; font-size: 12px; color: #00D4AA; }
+
+.check-label { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; color: #A0B0C8; cursor: pointer; margin: 4px 0; line-height: 1.5; }
+.check-label input { margin-top: 2px; accent-color: #00D4AA; width: 15px; height: 15px; flex-shrink: 0; }
+.checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; margin: 10px 0 16px; }
+@media (max-width: 700px) { .checklist-grid { grid-template-columns: 1fr; } }
+
+/* Generator section */
+.gen-section { background: #0D1335; border: 1px solid #1E2A5E; border-radius: 14px; padding: 24px 26px; margin-top: 30px; }
+.gen-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 6px; }
+.gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+@media (max-width: 760px) { .gen-grid { grid-template-columns: 1fr; } }
+.gen-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #7A8FA6; margin-bottom: 5px; }
+.tasks-note { font-size: 12px; color: #7A8FA6; margin-top: 4px; }
+.json-preview { background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7EE8C8; white-space: pre-wrap; line-height: 1.7; max-height: 320px; overflow-y: auto; margin: 14px 0; }
+.gen-btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.gen-btn { padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: .2s; }
+.gen-btn.primary { background: #00D4AA; color: #0A0F2E; }
+.gen-btn.primary:hover { background: #00F0C0; }
+.gen-btn.ghost { background: transparent; color: #00D4AA; border: 1px solid rgba(0,212,170,0.4); }
+.gen-btn.ghost:hover { background: rgba(0,212,170,0.1); }
+.gen-btn.copied { background: #00A882 !important; color: #fff !important; }
+
+.save-checklist { background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+.save-row { font-size: 13px; color: #A0B0C8; margin-bottom: 8px; display: flex; gap: 8px; align-items: flex-start; }
+.cmd-block { background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px; padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00D4AA; line-height: 2; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div id="prog" style="width:0%"></div>
+
+<header>
+  <div class="logo">⚡ Samsung GenAI</div>
+  <div class="day-badge">DAY 3</div>
+  <div class="lab-badge">Lab 2 — RAG vs. No-RAG Showdown</div>
+  <div style="margin-left:auto; font-size:12px; color:#7A8FA6;">Individual · Scored · PM</div>
+</header>
+
+<div class="container">
+  <h1>RAG vs. No-RAG Showdown</h1>
+  <p class="subtitle">Same question, twice. Once the model guesses from memory, once it's grounded in a real document. This is the direct fix for what Lab 1's Hallucination Lab just showed you going wrong.</p>
+
+  <div class="card">
+    <h3>How this works</h3>
+    <p>Retrieval-Augmented Generation (RAG) means giving the model the actual source document alongside your question, instead of trusting its training-time memory. Today you'll do the "retrieval" step by hand — copy-paste — so you can see exactly what changes in the model's answer when it has the real facts in front of it.</p>
+  </div>
+
+  <div class="card">
+    <h3>Step 1 — Pick one scenario</h3>
+    <p style="margin-bottom:10px">Click a card to select it and reveal its details.</p>
+  </div>
+
+  <!-- Scenario A -->
+  <div class="scenario-card" id="scen-A" onclick="selectScenario('A')">
+    <div class="scenario-header">
+      <div class="scenario-num">A</div>
+      <div class="scenario-title-wrap">
+        <div class="scenario-title">Care+ Warranty Question</div>
+        <div class="scenario-tag">Customer support — cracked screen, is it covered?</div>
+      </div>
+      <div class="scenario-check">○</div>
+    </div>
+    <div class="scenario-body">
+      <div class="field-label" style="margin-top:0">The question (use exactly, both runs)</div>
+      <div class="doc-text" style="margin-bottom:14px">"A customer's Galaxy Watch6 screen cracked after 14 months of ownership. Are they covered, and what should our support reply say?"</div>
+      <div class="doc-box">
+        <div class="doc-label">📄 Document to paste for the RAG run only</div>
+        <div class="doc-text" id="doc-A">Samsung Care+ Extended Protection Plan — Standard Limited Warranty covers manufacturing defects for 12 months from purchase. Accidental damage (including cracked screens) is covered only under a separately purchased Care+ plan, for that plan's active duration (12 or 24 months). Devices without an active Care+ plan and outside the 12-month standard warranty are not covered for accidental damage; the customer may use Samsung's authorized repair service at out-of-pocket cost.
+          <button class="copy-btn" onclick="event.stopPropagation();copyDoc('doc-A', this)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario B -->
+  <div class="scenario-card" id="scen-B" onclick="selectScenario('B')">
+    <div class="scenario-header">
+      <div class="scenario-num">B</div>
+      <div class="scenario-title-wrap">
+        <div class="scenario-title">Internal HR Policy Question</div>
+        <div class="scenario-tag">HR assistant — parental leave duration</div>
+      </div>
+      <div class="scenario-check">○</div>
+    </div>
+    <div class="scenario-body">
+      <div class="field-label" style="margin-top:0">The question (use exactly, both runs)</div>
+      <div class="doc-text" style="margin-bottom:14px">"How many weeks of parental leave does a Samsung India full-time employee get, and does it differ for primary vs. secondary caregivers?"</div>
+      <div class="doc-box">
+        <div class="doc-label">📄 Document to paste for the RAG run only</div>
+        <div class="doc-text" id="doc-B">Samsung India People Policy Handbook (2025 revision), Section 4.2 — Parental Leave: Primary caregivers (regardless of gender) are entitled to 26 weeks of fully paid parental leave. Secondary caregivers are entitled to 2 weeks of fully paid leave. Leave must be availed within 12 months of the child's birth or adoption date.
+          <button class="copy-btn" onclick="event.stopPropagation();copyDoc('doc-B', this)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scenario C -->
+  <div class="scenario-card" id="scen-C" onclick="selectScenario('C')">
+    <div class="scenario-header">
+      <div class="scenario-num">C</div>
+      <div class="scenario-title-wrap">
+        <div class="scenario-title">Product Spec Question</div>
+        <div class="scenario-tag">Pre-sales support — Galaxy Book5 Pro RAM</div>
+      </div>
+      <div class="scenario-check">○</div>
+    </div>
+    <div class="scenario-body">
+      <div class="field-label" style="margin-top:0">The question (use exactly, both runs)</div>
+      <div class="doc-text" style="margin-bottom:14px">"What is the maximum RAM configuration available on the Galaxy Book5 Pro, and does it support user upgrades after purchase?"</div>
+      <div class="doc-box">
+        <div class="doc-label">📄 Document to paste for the RAG run only</div>
+        <div class="doc-text" id="doc-C">Galaxy Book5 Pro official spec sheet: Memory options at purchase — 16GB or 32GB LPDDR5X, soldered on-board (not user-upgradeable after purchase). Storage is a separately replaceable NVMe SSD, up to 1TB at purchase.
+          <button class="copy-btn" onclick="event.stopPropagation();copyDoc('doc-C', this)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: No-RAG run -->
+  <div class="card">
+    <h3>Step 2 — Run 1: No-RAG (memory only)</h3>
+    <p style="margin-bottom:10px">Open any one AI tool in a fresh chat. Paste <strong style="color:#F8FAFF">only the question</strong> — no document. Record what it says.</p>
+    <a href="https://chat.openai.com" target="_blank" class="link-btn">ChatGPT ↗</a>
+    <a href="https://claude.ai" target="_blank" class="link-btn">Claude ↗</a>
+    <a href="https://gemini.google.com" target="_blank" class="link-btn">Gemini ↗</a>
+    <label class="field-label">Summarize the No-RAG answer (1–2 sentences) — did it sound confident? Was it actually right?</label>
+    <textarea id="no-rag-summary" rows="3" placeholder="e.g. It confidently said 12 months of full coverage regardless of Care+ status — sounds plausible but is wrong per the real policy."></textarea>
+  </div>
+
+  <!-- Step 3: RAG run -->
+  <div class="card">
+    <h3>Step 3 — Run 2: RAG (grounded)</h3>
+    <p style="margin-bottom:10px">New chat, same tool. This time paste: <em>"Use ONLY the following information to answer. Do not use anything outside it."</em> — then the document from your scenario card above — then the same question.</p>
+    <label class="field-label">Summarize the RAG (grounded) answer (1–2 sentences)</label>
+    <textarea id="rag-summary" rows="3" placeholder="What did it say this time, with the document provided?"></textarea>
+  </div>
+
+  <!-- Step 4: Judgement -->
+  <div class="card">
+    <h3>Step 4 — Judge the difference</h3>
+    <p style="margin-bottom:10px">All three outcomes below are valid, real findings — pick whichever actually happened.</p>
+    <div class="radio-row">
+      <label><input type="radio" name="judgement" value="fixed_wrong" onchange="renderJSON()"> RAG fixed a wrong No-RAG answer</label>
+      <label><input type="radio" name="judgement" value="confirmed_right" onchange="renderJSON()"> No-RAG was already right; RAG confirmed it</label>
+      <label><input type="radio" name="judgement" value="no_difference" onchange="renderJSON()"> No real difference either way</label>
+    </div>
+  </div>
+
+  <!-- Interrogation Room Recap -->
+  <div class="card" style="border-color:#7C3AED4D">
+    <h3 style="color:#C4B5FD">🔍 Interrogation Room Recap (from Lab 1)</h3>
+    <p style="margin-bottom:10px">Open the <strong style="color:#F8FAFF">📤 My Results</strong> page in this morning's app and copy the exact values shown there into the fields below.</p>
+    <div class="checklist-grid">
+      <label class="check-label"><input type="checkbox" id="ir-halluc" onchange="renderJSON()"> Hallucination Lab attempted</label>
+      <label class="check-label"><input type="checkbox" id="ir-bias" onchange="renderJSON()"> Bias Probe attempted</label>
+      <label class="check-label"><input type="checkbox" id="ir-guard" onchange="renderJSON()"> Guardrail Builder tested</label>
+      <label class="check-label"><input type="checkbox" id="ir-battle" onchange="renderJSON()"> Guardrail Battle completed (8/8 attacks reached)</label>
+    </div>
+    <div class="gen-grid">
+      <div class="gen-field"><label>Guardrail Battle — blocked</label><input type="number" id="ir-blocked" min="0" max="8" oninput="renderJSON()" placeholder="0–8"></div>
+      <div class="gen-field"><label>Guardrail Battle — total</label><input type="number" id="ir-total" min="0" max="8" oninput="renderJSON()" placeholder="usually 8"></div>
+    </div>
+    <div class="info-box warn">⚠️ This battle score is the main driver of your Gold/Diamond badge today — it's the one part of Lab 1 that's computed automatically from what the model actually did, not self-reported. Enter it exactly as shown in the app.</div>
+  </div>
+
+  <!-- Stretch -->
+  <div class="card">
+    <h3>Stretch (optional, feeds Diamond)</h3>
+    <p style="margin-bottom:10px">Choose <strong>one</strong>: either construct a case in today's RAG scenario where the provided document conflicts with what the model already "knew" — which one wins? Or go back to the Interrogation Room and run your own self-designed attack in Free Input / Guardrail Battle.</p>
+    <textarea id="stretch-notes" rows="3" oninput="renderJSON()" placeholder="Describe what you tried and what happened — leave blank to skip"></textarea>
+  </div>
+
+  <!-- ═══════════ COMBINED SUBMISSION GENERATOR ═══════════ -->
+  <div class="gen-section">
+    <h3>Submit — one auto-generated file, covering Lab 1 + Lab 2</h3>
+    <p style="font-size:13.5px; color:#A0B0C8; margin-bottom:14px">Fill in every field above, then click <strong style="color:#00D4AA">Generate &amp; Download day3.json</strong>. Your browser saves the file already correctly named and typed — no Notepad editing needed.</p>
+
+    <div class="gen-grid">
+      <div class="gen-field"><label>Full Name</label><input type="text" id="g-name" oninput="renderJSON()" placeholder="Your Full Name"></div>
+      <div class="gen-field"><label>GitHub Username</label><input type="text" id="g-github" oninput="renderJSON()" placeholder="your-github-username"></div>
+    </div>
+
+    <p class="tasks-note" id="g-tasks-note">0 / 6 core tasks detected as complete</p>
+    <div class="json-preview" id="json-preview">Fill in the fields above to build your submission JSON.</div>
+
+    <div class="gen-btn-row">
+      <button class="gen-btn primary" onclick="downloadJSON()">⬇ Generate &amp; Download day3.json</button>
+      <button class="gen-btn ghost" id="copy-json-btn" onclick="copyJSONToClipboard(this)">Copy JSON instead</button>
+    </div>
+
+    <div class="save-checklist">
+      <div class="save-row">📁 The download saves as <code>day3.json</code> in your <strong>Downloads</strong> folder.</div>
+      <div class="save-row">➡️ Move it into your <code>samsung-genai/submissions/</code> folder (drag-and-drop in File Explorer, or cut-paste).</div>
+      <div class="save-row">⚠️ Do not rename the file or change its extension — it must stay exactly <code>day3.json</code>.</div>
+    </div>
+
+    <div class="field-label">Push via Git Bash</div>
+    <div class="cmd-block">git add submissions/day3.json<br>git commit -m "Day 3 submission - YOUR NAME"<br>git push origin main</div>
+    <p style="font-size:12px; color:#7A8FA6; margin-top:8px">Right-click inside your <code>samsung-genai</code> folder → <strong>Git Bash Here</strong> → run the 3 commands above, one at a time. Replace YOUR NAME in the commit message.</p>
+  </div>
+</div>
+
+<script>
+let selectedScenario = null;
+
+function selectScenario(key) {
+  ['A','B','C'].forEach(k => {
+    const card = document.getElementById('scen-' + k);
+    card.classList.toggle('selected', k === key);
+    card.querySelector('.scenario-check').textContent = (k === key) ? '●' : '○';
+  });
+  selectedScenario = key;
+  renderJSON();
+}
+
+function copyDoc(id, btn) {
+  const text = document.getElementById(id).textContent.replace('Copy', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function buildSubmission() {
+  const name = document.getElementById('g-name').value.trim();
+  const github = document.getElementById('g-github').value.trim();
+
+  const noRagSummary = document.getElementById('no-rag-summary').value.trim();
+  const ragSummary = document.getElementById('rag-summary').value.trim();
+  const judgementEl = document.querySelector('input[name=judgement]:checked');
+  const judgement = judgementEl ? judgementEl.value : '';
+
+  const irHalluc = document.getElementById('ir-halluc').checked;
+  const irBias = document.getElementById('ir-bias').checked;
+  const irGuard = document.getElementById('ir-guard').checked;
+  const irBattleComplete = document.getElementById('ir-battle').checked;
+  const irBlocked = parseInt(document.getElementById('ir-blocked').value, 10) || 0;
+  const irTotal = parseInt(document.getElementById('ir-total').value, 10) || 0;
+
+  const stretchNotes = document.getElementById('stretch-notes').value.trim();
+
+  const requiredDone = [
+    irHalluc,
+    irBias,
+    irGuard,
+    irBattleComplete,
+    !!(selectedScenario && noRagSummary && ragSummary),
+    !!judgement,
+  ];
+  const tasksCompleted = requiredDone.filter(Boolean).length;
+  const tasksTotal = 6;
+
+  return {
+    day: 3,
+    student_name: name,
+    github: github,
+
+    ir_hallucination_done: irHalluc,
+    ir_bias_done: irBias,
+    ir_guardrail_builder_done: irGuard,
+    ir_battle_complete: irBattleComplete,
+    ir_battle_blocked: irBlocked,
+    ir_battle_total: irTotal,
+
+    rag_scenario: selectedScenario || '',
+    rag_no_rag_summary: noRagSummary,
+    rag_grounded_summary: ragSummary,
+    rag_judgement: judgement,
+
+    stretch_done: !!stretchNotes,
+    stretch_notes: stretchNotes,
+
+    tasks_completed: tasksCompleted,
+    tasks_total: tasksTotal,
+    submitted_at: new Date().toISOString(),
+  };
+}
+
+function renderJSON() {
+  const sub = buildSubmission();
+  document.getElementById('g-tasks-note').textContent = `${sub.tasks_completed} / ${sub.tasks_total} core tasks detected as complete · Guardrail Battle ${sub.ir_battle_blocked}/${sub.ir_battle_total} blocked`;
+  document.getElementById('json-preview').textContent = JSON.stringify(sub, null, 2);
+}
+
+function downloadJSON() {
+  const sub = buildSubmission();
+  const blob = new Blob([JSON.stringify(sub, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'day3.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyJSONToClipboard(btn) {
+  const sub = buildSubmission();
+  navigator.clipboard.writeText(JSON.stringify(sub, null, 2)).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy JSON instead'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+['no-rag-summary','rag-summary','g-name','g-github','stretch-notes','ir-blocked','ir-total'].forEach(id => {
+  document.getElementById(id).addEventListener('input', renderJSON);
+});
+['ir-halluc','ir-bias','ir-guard','ir-battle'].forEach(id => {
+  document.getElementById(id).addEventListener('change', renderJSON);
+});
+document.querySelectorAll('input[name=judgement]').forEach(r => r.addEventListener('change', renderJSON));
+
+renderJSON();
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 # AI Interrogation Room — Setup & Run Guide
-**Samsung GenAI Program · Bonus practice tool — not scored, not submitted**
+**Samsung GenAI Program · Day 3 · Lab 1 — scored, submitted via Lab 2**
 
 This is a small app that runs entirely on your own laptop. It uses a real local AI model (no ChatGPT/Claude/Gemini account, no API key, no internet needed once set up) so you can put an AI under pressure yourself — trigger hallucinations, catch bias, then build and attack your own safety guardrail. Everything runs for free, as many times as you like.
 

@@ -92,16 +92,20 @@ class TestBuildTrapPrompt:
 # ── build_bias_prompts ─────────────────────────────────────────────────────────
 class TestBuildBiasPrompts:
     def test_returns_two_pairs(self):
-        biased, corrected = build_bias_prompts(BIAS_PROBES[0])
-        assert len(biased) == 2 and len(corrected) == 2
+        run_a, run_b = build_bias_prompts(BIAS_PROBES[0])
+        assert len(run_a) == 2 and len(run_b) == 2
 
-    def test_biased_prompt_differs_from_corrected(self):
+    def test_run_a_differs_from_run_b(self):
         for probe in BIAS_PROBES:
-            b, c = build_bias_prompts(probe)
-            assert b[0] != c[0] or b[1] != c[1], f"Probe '{probe['id']}' biased == corrected"
+            a, b = build_bias_prompts(probe)
+            assert a[0] != b[0] or a[1] != b[1], f"Probe '{probe['id']}' run_a == run_b"
 
     def test_all_probes_have_required_keys(self):
-        required = {"id", "label", "biased_system", "biased_prompt", "corrected_system", "corrected_prompt", "what_to_watch"}
+        required = {
+            "id", "label", "what_to_watch", "discussion_prompt",
+            "run_a_label", "run_a_system", "run_a_prompt",
+            "run_b_label", "run_b_system", "run_b_prompt",
+        }
         for p in BIAS_PROBES:
             for k in required:
                 assert k in p, f"Probe '{p.get('id')}' missing key '{k}'"
@@ -178,6 +182,23 @@ class TestDataIntegrity:
     def test_trap_ids_are_unique(self):
         ids = [t["id"] for t in HALLUCINATION_TRAPS]
         assert len(ids) == len(set(ids))
+
+    def test_bias_probe_ids_cover_expected_types(self):
+        ids = {p["id"] for p in BIAS_PROBES}
+        assert ids == {"platform_bias", "format_bias", "gender_bias", "accent_bias"}
+
+    def test_gender_bias_resume_is_identical_except_name(self):
+        probe = next(p for p in BIAS_PROBES if p["id"] == "gender_bias")
+        a = probe["run_a_prompt"].replace("Rohan", "NAME")
+        b = probe["run_b_prompt"].replace("Priya", "NAME")
+        assert a == b, "gender_bias resume text must be identical except the candidate's first name"
+
+    def test_accent_bias_ticket_reports_same_issue(self):
+        probe = next(p for p in BIAS_PROBES if p["id"] == "accent_bias")
+        assert "disconnect" in probe["run_a_prompt"].lower()
+        assert "disconnect" in probe["run_b_prompt"].lower()
+        assert "walk" in probe["run_a_prompt"].lower()
+        assert "walk" in probe["run_b_prompt"].lower()
 
     def test_no_leftover_de_or_claude_references(self):
         blob = json.dumps(HALLUCINATION_TRAPS) + json.dumps(BIAS_PROBES) + json.dumps(ADVERSARIAL_ATTACKS) + DEFAULT_GUARDRAIL + DANGEROUS_PROMPT

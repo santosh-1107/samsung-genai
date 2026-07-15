@@ -1,0 +1,20 @@
+{
+  "day": 3,
+  "student_name": "G.Sai Santosh Preetam",
+  "github": "santosh_1107",
+  "ir_hallucination_done": true,
+  "ir_bias_done": true,
+  "ir_guardrail_builder_done": true,
+  "ir_battle_complete": true,
+  "ir_battle_blocked": 8,
+  "ir_battle_total": 8,
+  "rag_scenario": "B",
+  "rag_no_rag_summary": "it said Primary caregiver: 26 weeks paid parental leave.\nSecondary caregiver: 12 weeks paid parental leave but didn't give the difference for the primary and secondary caregivers and didn't give clause that leave must be applied with in 12 months  of the child's birth",
+  "rag_grounded_summary": "It gave the complete data f the leave accessable and clause stating the 12 month window for the leave application and also gave the clear difference for the primary and the secondary caregivers",
+  "rag_judgement": "confirmed_right",
+  "stretch_done": true,
+  "stretch_notes": "in the rag scenario actually the model kneww the correct info ....even before adding the doc ....after adding the doc it gave the  confirmation",
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": "2026-07-15T06:50:34.396Z"
+}

@@ -1,0 +1,52 @@
+{
+  "day": 4,
+  "student_name": "G.Sai Santosh Preetam",
+  "github": "santosh-1107",
+  "incidents": [
+    {
+      "id": "A",
+      "failure_type": "Hallucination",
+      "principle": "Transparency",
+      "justification": "the bot invented a discount policy that didn’t exist...misleading the customer with false information"
+    },
+    {
+      "id": "B",
+      "failure_type": "Privacy Violation",
+      "principle": "Privacy",
+      "justification": "The assistant exposed sensitive internal employee information inappropriately with out the knowledge of the user"
+    },
+    {
+      "id": "C",
+      "failure_type": "Deepfake/Misinformation",
+      "principle": "Reliability",
+      "justification": "The AI-generated clip presented false/misleading information"
+    },
+    {
+      "id": "D",
+      "failure_type": "Bias/Discrimination",
+      "principle": "Fairness",
+      "justification": "The resume screener applied biased filtering that disadvantaged certain groups of applicants"
+    },
+    {
+      "id": "E",
+      "failure_type": "Lack of Human Oversight",
+      "principle": "Human Oversight",
+      "justification": "Automated moderation systems can wrongly censor legitimate posts or fail to catch harmful ones"
+    },
+    {
+      "id": "F",
+      "failure_type": "Security Breach",
+      "principle": "Security",
+      "justification": "The finance department’s phone call exposed sensitive financial information to unauthorized personals"
+    }
+  ],
+  "justifications_written": 6,
+  "stretch_done": true,
+  "stretch_company": "chat gpt",
+  "stretch_failure_type": "Hallucination",
+  "stretch_principle": "Transparency",
+  "stretch_notes": "gave wrong and unrelaible answer",
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": "2026-07-16T06:26:51.997Z"
+}

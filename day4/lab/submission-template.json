@@ -1,0 +1,25 @@
+{
+  "day": 4,
+  "student_name": "Your Full Name",
+  "github": "your-github-username",
+
+  "incidents": [
+    { "id": "A", "failure_type": "Hallucination", "principle": "Accountability", "justification": "One-line reason for your call" },
+    { "id": "B", "failure_type": "Privacy Violation", "principle": "Privacy", "justification": "One-line reason for your call" },
+    { "id": "C", "failure_type": "Deepfake/Misinformation", "principle": "Security", "justification": "One-line reason for your call" },
+    { "id": "D", "failure_type": "Bias/Discrimination", "principle": "Fairness", "justification": "One-line reason for your call" },
+    { "id": "E", "failure_type": "Lack of Human Oversight", "principle": "Human Oversight", "justification": "One-line reason for your call" },
+    { "id": "F", "failure_type": "Security Breach", "principle": "Security", "justification": "One-line reason for your call" }
+  ],
+  "justifications_written": 6,
+
+  "stretch_done": false,
+  "stretch_company": "",
+  "stretch_failure_type": "",
+  "stretch_principle": "",
+  "stretch_notes": "",
+
+  "tasks_completed": 6,
+  "tasks_total": 6,
+  "submitted_at": ""
+}

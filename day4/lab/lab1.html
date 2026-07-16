@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 — Lab 1: Incident Investigator | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0A0F2E; color: #F8FAFF; font-family: 'Inter', sans-serif; min-height: 100vh; }
+
+#prog { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, #00D4AA, #1428A0); z-index: 999; width: 0%; transition: width 0.4s; }
+
+header {
+  background: #0D1335; border-bottom: 1px solid #1E2A5E;
+  padding: 14px 32px; display: flex; align-items: center; gap: 14px;
+  position: sticky; top: 0; z-index: 100; flex-wrap: wrap;
+}
+.logo { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: #00D4AA; }
+.day-badge { background: #1428A0; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; }
+.lab-badge { background: rgba(0,212,170,0.15); color: #00D4AA; font-size: 11px; font-weight: 600; padding: 4px 12px; border-radius: 20px; border: 1px solid rgba(0,212,170,0.25); }
+
+.container { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+h1 { font-family: 'Space Grotesk', sans-serif; font-size: 30px; font-weight: 700; margin-bottom: 6px; }
+.subtitle { color: #7A8FA6; font-size: 14px; margin-bottom: 28px; }
+
+.card {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  padding: 22px 24px; margin-bottom: 20px;
+}
+.card h3 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+.card p, .card li { font-size: 13.5px; color: #A0B0C8; line-height: 1.7; }
+
+/* Incident cards */
+.prompt-card {
+  background: #111830; border: 1px solid #1E2A5E; border-radius: 14px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.prompt-header {
+  padding: 18px 24px; display: flex; align-items: center; gap: 14px;
+  cursor: pointer; user-select: none;
+}
+.prompt-num {
+  width: 36px; height: 36px; border-radius: 10px; background: #1428A0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 15px; flex-shrink: 0;
+}
+.prompt-title-wrap { flex: 1; }
+.prompt-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; }
+.prompt-tag { font-size: 11px; color: #7A8FA6; margin-top: 2px; }
+.chevron { color: #7A8FA6; font-size: 18px; transition: transform 0.3s; }
+.prompt-card.open .chevron { transform: rotate(180deg); }
+.prompt-body { display: none; padding: 0 24px 24px; }
+.prompt-card.open .prompt-body { display: block; }
+
+.prompt-text-box {
+  background: #0D1B3E; border: 1px solid #1E3070; border-radius: 10px;
+  padding: 16px 18px; margin-bottom: 16px;
+}
+.prompt-text-label { font-size: 10px; font-weight: 600; color: #3A6BC4; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.prompt-text { font-size: 14px; line-height: 1.75; color: #C8D8F0; }
+
+.field-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #00D4AA; margin: 12px 0 6px; display: block; }
+textarea, input[type=text], select {
+  width: 100%; background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 10px 12px; color: #F8FAFF; font-size: 13px; font-family: 'Inter', sans-serif; resize: vertical;
+}
+textarea:focus, input[type=text]:focus, select:focus { outline: none; border-color: #00D4AA; }
+select { appearance: none; cursor: pointer; }
+
+.select-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 6px; }
+@media (max-width: 700px) { .select-row { grid-template-columns: 1fr; } }
+
+.info-box {
+  background: #0D1B3E; border-left: 3px solid #1428A0; border-radius: 0 8px 8px 0;
+  padding: 12px 16px; margin: 10px 0 14px; font-size: 13px; color: #A0B0C8; line-height: 1.7;
+}
+.info-box strong { color: #F8FAFF; }
+code { font-family: 'IBM Plex Mono', monospace; background: #1E2A5E; padding: 2px 7px; border-radius: 4px; font-size: 12px; color: #00D4AA; }
+
+/* Generator section */
+.gen-section { background: #0D1335; border: 1px solid #1E2A5E; border-radius: 14px; padding: 24px 26px; margin-top: 30px; }
+.gen-section h3 { font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 6px; }
+.gen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 16px 0; }
+@media (max-width: 760px) { .gen-grid { grid-template-columns: 1fr; } }
+.gen-field label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #7A8FA6; margin-bottom: 5px; }
+.tasks-note { font-size: 12px; color: #7A8FA6; margin-top: 4px; }
+.json-preview {
+  background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 16px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #7EE8C8; white-space: pre-wrap;
+  line-height: 1.7; max-height: 320px; overflow-y: auto; margin: 14px 0;
+}
+.gen-btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.gen-btn {
+  padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 14px; border: none; cursor: pointer; transition: .2s;
+}
+.gen-btn.primary { background: #00D4AA; color: #0A0F2E; }
+.gen-btn.primary:hover { background: #00F0C0; }
+.gen-btn.ghost { background: transparent; color: #00D4AA; border: 1px solid rgba(0,212,170,0.4); }
+.gen-btn.ghost:hover { background: rgba(0,212,170,0.1); }
+.gen-btn.copied { background: #00A882 !important; color: #fff !important; }
+
+.save-checklist { background: #070C1F; border: 1px solid #1E2A5E; border-radius: 10px; padding: 14px 16px; margin: 14px 0; }
+.save-row { font-size: 13px; color: #A0B0C8; margin-bottom: 8px; display: flex; gap: 8px; align-items: flex-start; }
+.cmd-block {
+  background: #070C1F; border: 1px solid #1E2A5E; border-radius: 8px;
+  padding: 14px 16px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: #00D4AA; line-height: 2; margin-top: 10px;
+}
+</style>
+</head>
+<body>
+<div id="prog" style="width:0%"></div>
+
+<header>
+  <div class="logo">⚡ Samsung GenAI</div>
+  <div class="day-badge">DAY 4</div>
+  <div class="lab-badge">Lab 1 — Incident Investigator</div>
+  <div style="margin-left:auto; font-size:12px; color:#7A8FA6;">Individual · Scored</div>
+</header>
+
+<div class="container">
+  <h1>Incident Investigator</h1>
+  <p class="subtitle">Six anonymised AI-failure files. Your job: classify each one, no answer key provided — this is your own judgement call.</p>
+
+  <div class="card">
+    <h3>Your role</h3>
+    <p>You're a Junior Responsible AI Analyst at Samsung's AI Governance Office. Six incident summaries have landed on your desk with the company names stripped out. For each one, decide: what type of failure was this, and which of the 10 Responsible AI principles (from today's Section 4) was violated hardest? Write a one-line justification for your call.</p>
+  </div>
+
+  <div class="info-box">
+    <strong>Failure type options:</strong> Hallucination · Bias/Discrimination · Privacy Violation · Deepfake/Misinformation · Lack of Human Oversight · Security Breach<br><br>
+    <strong>Responsible AI principles:</strong> Fairness · Accountability · Transparency · Explainability · Privacy · Safety · Human Oversight · Reliability · Security · Inclusiveness
+  </div>
+
+  <!-- Incident A -->
+  <div class="prompt-card open" id="pcard-a">
+    <div class="prompt-header" onclick="togglePrompt('pcard-a')">
+      <div class="prompt-num">A</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File A</div>
+        <div class="prompt-tag">Travel booking support bot</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">A conversational support bot for a travel booking site told a customer it would honour a discount that was never actually offered, inventing a policy on the spot with total confidence. The company later had to honour it after the customer's complaint went public.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="a-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="a-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="a-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Incident B -->
+  <div class="prompt-card" id="pcard-b">
+    <div class="prompt-header" onclick="togglePrompt('pcard-b')">
+      <div class="prompt-num">B</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File B</div>
+        <div class="prompt-tag">Internal employee chat assistant</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">An internal chat assistant at a mid-size firm was discovered, months after rollout, to have been logging every employee message — including several containing unredacted client contract terms — with no employee ever told this was happening.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="b-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="b-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="b-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Incident C -->
+  <div class="prompt-card" id="pcard-c">
+    <div class="prompt-header" onclick="togglePrompt('pcard-c')">
+      <div class="prompt-num">C</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File C</div>
+        <div class="prompt-tag">Regional business news clip</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">A short video clip of a well-known regional business leader announcing a "surprise" company decision spread rapidly online. It was later confirmed to be entirely AI-generated — and had already moved the firm's stock price before it was debunked.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="c-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="c-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="c-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Incident D -->
+  <div class="prompt-card" id="pcard-d">
+    <div class="prompt-header" onclick="togglePrompt('pcard-d')">
+      <div class="prompt-num">D</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File D</div>
+        <div class="prompt-tag">Manufacturing company resume screener</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">A resume-screening tool used by a mid-size manufacturing company was later found to be quietly down-ranking applicants who had attended certain women's colleges — despite gender never appearing as an explicit input field anywhere in the system.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="d-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="d-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="d-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Incident E -->
+  <div class="prompt-card" id="pcard-e">
+    <div class="prompt-header" onclick="togglePrompt('pcard-e')">
+      <div class="prompt-num">E</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File E</div>
+        <div class="prompt-tag">Community platform content moderation</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">An automated content moderation system began removing one specific community group's posts at a far higher rate than everyone else's for several weeks — and no human reviewed the pattern until an outside journalist raised it publicly.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="e-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="e-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="e-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Incident F -->
+  <div class="prompt-card" id="pcard-f">
+    <div class="prompt-header" onclick="togglePrompt('pcard-f')">
+      <div class="prompt-num">F</div>
+      <div class="prompt-title-wrap">
+        <div class="prompt-title">Incident File F</div>
+        <div class="prompt-tag">Finance-department phone call</div>
+      </div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="prompt-body">
+      <div class="prompt-text-box">
+        <div class="prompt-text-label">Case summary</div>
+        <div class="prompt-text">Scammers used a voice-cloning tool to imitate a company's finance director over a phone call, convincing a junior staff member to authorise a wire transfer of funds to an external account.</div>
+      </div>
+      <div class="select-row">
+        <div><label class="field-label">Failure type</label>
+          <select id="f-type" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+          </select>
+        </div>
+        <div><label class="field-label">Principle violated hardest</label>
+          <select id="f-principle" onchange="renderJSON()">
+            <option value="">— select —</option>
+            <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+          </select>
+        </div>
+      </div>
+      <label class="field-label">One-line justification</label>
+      <textarea id="f-justification" rows="2" oninput="renderJSON()" placeholder="Why this failure type and principle?"></textarea>
+    </div>
+  </div>
+
+  <!-- Stretch -->
+  <div class="card">
+    <h3>Stretch (optional)</h3>
+    <p style="margin-bottom:10px">Research and write up one additional real AI-failure case not covered in today's content — name the actual company.</p>
+    <label class="field-label">Company / product name</label>
+    <input type="text" id="stretch-company" oninput="renderJSON()" placeholder="e.g. a real company name">
+    <label class="field-label">Failure type</label>
+    <select id="stretch-type" onchange="renderJSON()">
+      <option value="">— select —</option>
+      <option>Hallucination</option><option>Bias/Discrimination</option><option>Privacy Violation</option><option>Deepfake/Misinformation</option><option>Lack of Human Oversight</option><option>Security Breach</option>
+    </select>
+    <label class="field-label">Principle violated hardest</label>
+    <select id="stretch-principle" onchange="renderJSON()">
+      <option value="">— select —</option>
+      <option>Fairness</option><option>Accountability</option><option>Transparency</option><option>Explainability</option><option>Privacy</option><option>Safety</option><option>Human Oversight</option><option>Reliability</option><option>Security</option><option>Inclusiveness</option>
+    </select>
+    <label class="field-label">Brief description</label>
+    <textarea id="stretch-notes" rows="3" oninput="renderJSON()" placeholder="What happened, and why does it fit the failure type/principle you chose?"></textarea>
+  </div>
+
+  <!-- ═══════════ SUBMISSION GENERATOR ═══════════ -->
+  <div class="gen-section">
+    <h3>Submit — one auto-generated file</h3>
+    <p style="font-size:13.5px; color:#A0B0C8; margin-bottom:14px">Fill in your name and GitHub username below, then click <strong style="color:#00D4AA">Generate &amp; Download day4.json</strong>. Your browser saves the file already correctly named and typed — no Notepad editing needed.</p>
+
+    <div class="gen-grid">
+      <div class="gen-field"><label>Full Name</label><input type="text" id="g-name" oninput="renderJSON()" placeholder="Your Full Name"></div>
+      <div class="gen-field"><label>GitHub Username</label><input type="text" id="g-github" oninput="renderJSON()" placeholder="your-github-username"></div>
+    </div>
+
+    <p class="tasks-note" id="g-tasks-note">0 / 6 incidents fully classified</p>
+    <div class="json-preview" id="json-preview">Fill in the fields above to build your submission JSON.</div>
+
+    <div class="gen-btn-row">
+      <button class="gen-btn primary" onclick="downloadJSON()">⬇ Generate &amp; Download day4.json</button>
+      <button class="gen-btn ghost" id="copy-json-btn" onclick="copyJSONToClipboard(this)">Copy JSON instead</button>
+    </div>
+
+    <div class="save-checklist">
+      <div class="save-row">📁 The download saves as <code>day4.json</code> in your <strong>Downloads</strong> folder.</div>
+      <div class="save-row">➡️ Move it into your <code>samsung-genai/submissions/</code> folder (drag-and-drop in File Explorer, or cut-paste).</div>
+      <div class="save-row">⚠️ Do not rename the file or change its extension — it must stay exactly <code>day4.json</code>.</div>
+    </div>
+
+    <div class="field-label">Push via Git Bash</div>
+    <div class="cmd-block">git add submissions/day4.json<br>git commit -m "Day 4 submission - YOUR NAME"<br>git push origin main</div>
+    <p style="font-size:12px; color:#7A8FA6; margin-top:8px">Right-click inside your <code>samsung-genai</code> folder → <strong>Git Bash Here</strong> → run the 3 commands above, one at a time. Replace YOUR NAME in the commit message.</p>
+  </div>
+</div>
+
+<script>
+function togglePrompt(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+
+const INCIDENT_IDS = ['a','b','c','d','e','f'];
+
+function buildSubmission() {
+  const name = document.getElementById('g-name').value.trim();
+  const github = document.getElementById('g-github').value.trim();
+
+  const incidents = INCIDENT_IDS.map(id => ({
+    id: id.toUpperCase(),
+    failure_type: document.getElementById(id+'-type').value,
+    principle: document.getElementById(id+'-principle').value,
+    justification: document.getElementById(id+'-justification').value.trim(),
+  }));
+
+  const classifiedCount = incidents.filter(i => i.failure_type && i.principle).length;
+  const justificationsCount = incidents.filter(i => i.justification).length;
+
+  const stretchCompany = document.getElementById('stretch-company').value.trim();
+  const stretchType = document.getElementById('stretch-type').value;
+  const stretchPrinciple = document.getElementById('stretch-principle').value;
+  const stretchNotes = document.getElementById('stretch-notes').value.trim();
+  const stretchDone = !!(stretchCompany && stretchType && stretchPrinciple && stretchNotes);
+
+  return {
+    day: 4,
+    student_name: name,
+    github: github,
+
+    incidents: incidents,
+    justifications_written: justificationsCount,
+
+    stretch_done: stretchDone,
+    stretch_company: stretchCompany,
+    stretch_failure_type: stretchType,
+    stretch_principle: stretchPrinciple,
+    stretch_notes: stretchNotes,
+
+    tasks_completed: classifiedCount,
+    tasks_total: 6,
+    submitted_at: new Date().toISOString(),
+  };
+}
+
+function renderJSON() {
+  const sub = buildSubmission();
+  document.getElementById('g-tasks-note').textContent = `${sub.tasks_completed} / ${sub.tasks_total} incidents fully classified · ${sub.justifications_written} / 6 justifications written`;
+  document.getElementById('json-preview').textContent = JSON.stringify(sub, null, 2);
+}
+
+function downloadJSON() {
+  const sub = buildSubmission();
+  const blob = new Blob([JSON.stringify(sub, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'day4.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function copyJSONToClipboard(btn) {
+  const sub = buildSubmission();
+  navigator.clipboard.writeText(JSON.stringify(sub, null, 2)).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy JSON instead'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+renderJSON();
+</script>
+</body>
+</html>

@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Day 4 — AI Ethics and Responsibility | Samsung GenAI Program</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0D111F;--card:#141B2D;--card2:#1A2235;--accent:#00D4AA;--accent2:#0099CC;--white:#FFFFFF;--text:#BBC8D8;--dim:#7A8FA6;--danger:#EF4444;--warn:#F59E0B;--success:#10B981;--border:#1E2A3D}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:17px;line-height:1.6;overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(13,17,31,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;gap:4px;overflow-x:auto}
+nav::-webkit-scrollbar{height:3px}
+nav::-webkit-scrollbar-thumb{background:var(--accent)}
+.nav-pill{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;color:var(--dim);text-decoration:none;transition:.2s;border:1px solid transparent;cursor:pointer}
+.nav-pill:hover,.nav-pill.active{background:var(--accent)20;color:var(--accent);border-color:var(--accent)40}
+.nav-brand{font-size:13px;font-weight:800;color:var(--accent);margin-right:16px;white-space:nowrap;flex-shrink:0}
+.nav-prog{margin-left:auto;font-size:11px;color:var(--dim);flex-shrink:0;white-space:nowrap}
+
+/* SECTIONS */
+.section{min-height:100vh;padding:80px 48px 48px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid var(--border)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+.section-title{font-size:36px;font-weight:800;color:var(--white);margin-bottom:8px;line-height:1.2}
+.section-sub{font-size:18px;color:var(--dim);margin-bottom:32px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px}
+.card-grid{display:grid;gap:16px}
+.card-grid-2{grid-template-columns:1fr 1fr}
+.card-grid-3{grid-template-columns:1fr 1fr 1fr}
+.card-grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+@media(max-width:900px){.card-grid-2,.card-grid-3,.card-grid-4{grid-template-columns:1fr}}
+.accent-bar{width:40px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:12px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-size:15px;font-weight:600;border:none;cursor:pointer;transition:.2s}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{background:#00F0C0}
+.btn-ghost{background:transparent;color:var(--accent);border:1px solid var(--accent)60}
+.btn-ghost:hover{background:var(--accent)15}
+.btn-sm{padding:8px 16px;font-size:13px}
+
+/* BADGES */
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-accent{background:var(--accent)20;color:var(--accent);border:1px solid var(--accent)40}
+.badge-danger{background:var(--danger)20;color:var(--danger);border:1px solid var(--danger)40}
+.badge-warn{background:var(--warn)20;color:var(--warn);border:1px solid var(--warn)40}
+.badge-success{background:var(--success)20;color:var(--success);border:1px solid var(--success)40}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{background:#00274D;color:var(--accent);font-size:13px;font-weight:700;padding:12px 16px;text-align:left}
+.data-table td{padding:11px 16px;font-size:14px;border-bottom:1px solid var(--border)}
+.data-table tr:nth-child(even) td{background:var(--card2)}
+.data-table tr:hover td{background:#1E2A3D}
+
+/* ACCORDION */
+.accordion-item{border:1px solid var(--border);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.accordion-header{padding:16px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;font-weight:600;color:var(--white);background:var(--card);transition:.2s}
+.accordion-header:hover{background:var(--card2)}
+.accordion-body{padding:0 20px;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s}
+.accordion-body.open{max-height:500px;padding:16px 20px}
+.chevron{transition:.3s;color:var(--accent)}
+.chevron.open{transform:rotate(180deg)}
+
+/* CODE / DANGER BLOCKS */
+.code-block{background:#090D18;border:1px solid var(--border);border-radius:6px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--accent);white-space:pre-wrap;margin:8px 0}
+.danger-block{background:var(--danger)10;border:1px solid var(--danger)30;border-radius:6px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#FCA5A5;white-space:pre-wrap;margin:8px 0}
+.prevent-tip{background:var(--success)10;border-left:3px solid var(--success);padding:10px 14px;border-radius:0 6px 6px 0;font-size:13px;color:#6EE7B7;margin-top:8px}
+
+/* ANIMATIONS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.fade-in{animation:fadeIn .4s ease}
+
+/* HERO */
+.hero-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+@media(max-width:900px){.hero-grid{grid-template-columns:repeat(2,1fr)}}
+.hero-tile{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;cursor:pointer;transition:.2s;text-decoration:none}
+.hero-tile:hover{border-color:var(--accent);transform:translateY(-3px)}
+.hero-tile-num{font-size:11px;font-weight:700;color:var(--accent)}
+.hero-tile-label{font-size:14px;font-weight:600;color:var(--white);margin-top:4px}
+
+/* TOGGLE / TABS */
+.toggle-wrap{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:24px;flex-wrap:wrap}
+.toggle-btn{padding:12px 28px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.2s}
+.toggle-btn.active{background:var(--accent);color:#000}
+.toggle-btn:not(.active){background:var(--card);color:var(--dim)}
+
+/* FLIP CARDS */
+.flip-card{perspective:1000px;cursor:pointer}
+.flip-inner{transition:transform .6s;transform-style:preserve-3d;position:relative}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg)}
+.flip-front,.flip-back{backface-visibility:hidden;border-radius:12px;padding:22px;min-height:190px;box-sizing:border-box}
+.flip-front{background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.flip-back{background:var(--card2);border:1px solid var(--accent)40;position:absolute;top:0;left:0;right:0;bottom:0;transform:rotateY(180deg);overflow:auto}
+
+/* PRIORITY CHIP / SELECTOR (reused for regulations/quick pick) */
+.priority-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:20px;border:1px solid var(--border);background:var(--card2);cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);margin:4px 6px 4px 0;transition:.15s}
+.priority-chip.active{border-color:var(--accent);background:var(--accent)1A;color:var(--accent)}
+.selector-result{background:#090D18;border:1px solid var(--accent)40;border-radius:10px;padding:18px;font-size:14px;color:var(--text);line-height:1.7;min-height:100px}
+
+/* GAME CARDS (in-class activities) */
+.game-card{background:#7C3AED0F;border:1px solid #7C3AED55;border-radius:12px;overflow:hidden;margin:20px 0}
+.game-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer}
+.game-header:hover{background:#7C3AED0A}
+.game-header-left{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.game-tag{font-size:10.5px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#C4B5FD;background:#7C3AED26;border:1px solid #7C3AED4D;border-radius:4px;padding:3px 8px}
+.game-title{font-size:16px;font-weight:700;color:#C4B5FD}
+.game-toggle{font-size:18px;color:#A78BFA;transition:.3s}
+.game-card.open .game-toggle{transform:rotate(90deg)}
+.game-body{display:none;padding:0 20px 20px}
+.game-card.open .game-body{display:block;animation:fadeIn .3s}
+.game-dur{font-size:12px;color:#A78BFA;border:1px solid #7C3AED4D;border-radius:4px;padding:2px 9px;margin-bottom:12px;display:inline-block}
+.game-desc{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.6}
+.game-primer{background:#7C3AED14;border-left:3px solid #7C3AED88;border-radius:0 8px 8px 0;padding:10px 14px;margin-bottom:14px;font-size:13.5px;color:#C4B5FD;line-height:1.6}
+.game-steps{list-style:none;padding:0;counter-reset:gs}
+.game-steps li{counter-increment:gs;display:flex;gap:10px;margin-bottom:10px;font-size:14px;color:var(--text)}
+.game-steps li::before{content:counter(gs);min-width:22px;height:22px;border-radius:50%;background:#7C3AED33;color:#A78BFA;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.game-debrief{margin-top:12px;padding:10px 14px;background:var(--success)10;border-left:3px solid var(--success);border-radius:0 8px 8px 0;font-size:13.5px;color:#6EE7B7}
+.game-reveal-list{margin-top:10px;padding-left:0;list-style:none}
+.game-reveal-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;cursor:pointer;padding:10px 14px;border:1px solid #7C3AED33;border-radius:8px;margin-bottom:6px;background:#7C3AED08;transition:.15s}
+.game-reveal-list li:hover{border-color:#7C3AED66;background:#7C3AED14}
+.game-reveal-list .game-q{font-size:14px;color:var(--white)}
+.game-reveal-list .game-a{font-size:13px;font-weight:700;opacity:0;transition:opacity .2s}
+.game-reveal-list li.revealed .game-a{opacity:1}
+
+/* SELF-CHECK */
+.selfcheck{background:#7C3AED12;border:1px solid #7C3AED4D;border-radius:10px;padding:18px 20px;margin:20px 0}
+.selfcheck-q{font-size:15px;color:#C4B5FD;margin-bottom:12px;font-weight:600;line-height:1.5}
+.selfcheck-btn{font-size:13px;background:#7C3AED26;border:1px solid #7C3AED66;color:#A78BFA;border-radius:6px;padding:8px 16px;cursor:pointer;font-weight:600}
+.selfcheck-btn:hover{background:#7C3AED3D}
+.selfcheck-ans{display:none;margin-top:14px;padding-top:14px;border-top:1px solid #7C3AED33;font-size:14px;color:var(--text);line-height:1.65}
+.selfcheck-ans.show{display:block;animation:fadeIn .3s}
+
+/* QUIZ */
+.quiz-q{font-size:20px;font-weight:700;color:var(--white);margin-bottom:24px;line-height:1.4}
+.quiz-opt{padding:16px 20px;border:2px solid var(--border);border-radius:10px;cursor:pointer;margin-bottom:10px;font-size:16px;transition:.2s;background:var(--card)}
+.quiz-opt:hover:not(.disabled){border-color:var(--accent);background:var(--accent)10}
+.quiz-opt.correct{border-color:var(--success);background:var(--success)15;color:var(--success)}
+.quiz-opt.wrong{border-color:var(--danger);background:var(--danger)10;color:#FCA5A5}
+.quiz-opt.disabled{cursor:default;pointer-events:none}
+.quiz-progress{display:flex;gap:6px;margin-bottom:24px}
+.quiz-prog-dot{width:32px;height:4px;border-radius:2px;background:var(--border)}
+.quiz-prog-dot.done{background:var(--accent)}
+.quiz-prog-dot.current{background:var(--accent)60}
+.score-ring{width:140px;height:140px;border-radius:50%;border:8px solid var(--accent);display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 24px}
+.score-num{font-size:42px;font-weight:800;color:var(--white)}
+.score-total{font-size:16px;color:var(--dim)}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:10px;height:10px;z-index:9999;animation:fall 3s linear forwards;pointer-events:none}
+
+/* LABS SECTION */
+.lab-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:26px 28px;margin-bottom:18px}
+.lab-badge{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--accent)1A;color:var(--accent);border:1px solid var(--accent)4D;border-radius:4px;padding:4px 11px;display:inline-block;margin-bottom:14px}
+.lab-card h3{font-size:21px;font-weight:800;color:var(--white);margin-bottom:8px}
+.lab-role{font-size:13px;color:var(--accent2);margin-bottom:10px;font-weight:600}
+.lab-card .desc{font-size:15px;color:var(--text);margin-bottom:16px;line-height:1.65}
+.lab-tasks{padding-left:20px;font-size:14.5px;color:var(--text)}
+.lab-tasks li{margin-bottom:8px;line-height:1.6}
+.stretch-note{display:inline-block;font-size:12.5px;color:var(--warn);border:1px solid var(--warn)4D;border-radius:6px;padding:8px 14px;margin:12px 0}
+.lab-link{display:inline-block;margin-top:16px;background:var(--accent);color:#000;font-weight:700;font-size:14px;text-decoration:none;padding:11px 22px;border-radius:8px;transition:.2s}
+.lab-link:hover{background:#00F0C0}
+.ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+@media(max-width:700px){.ach-grid{grid-template-columns:1fr}}
+.ach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.ach-icon{font-size:26px;margin-bottom:6px}
+.ach-name{font-size:14px;font-weight:700;color:var(--white);margin-bottom:3px}
+.ach-desc{font-size:12px;color:var(--dim)}
+
+/* AHASLIDES QUIZ MARKER */
+.quiz-marker{background:#DB27771A;border:1px solid #DB277759;border-radius:10px;padding:16px 22px;margin:26px 0;display:flex;align-items:center;gap:16px}
+.quiz-icon{font-size:22px;flex-shrink:0}
+.quiz-title{font-size:14px;font-weight:700;color:#F472B6}
+.quiz-desc{font-size:12.5px;color:var(--dim);margin-top:3px}
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav id="main-nav">
+  <span class="nav-brand">⚡ Samsung GenAI · Day 4</span>
+  <a class="nav-pill active" href="#s1">Mission</a>
+  <a class="nav-pill" href="#s2">Why Ethics Matters</a>
+  <a class="nav-pill" href="#s3">Real-World Failures</a>
+  <a class="nav-pill" href="#s4">RAI Principles</a>
+  <a class="nav-pill" href="#s5">Bias in AI</a>
+  <a class="nav-pill" href="#s6">Privacy &amp; Security</a>
+  <a class="nav-pill" href="#s7">Hallucinations</a>
+  <a class="nav-pill" href="#s8">Explainability</a>
+  <a class="nav-pill" href="#s9">Governance</a>
+  <a class="nav-pill" href="#s10">Regulations</a>
+  <a class="nav-pill" href="#s11">Enterprises</a>
+  <a class="nav-pill" href="#s12">Practice Quiz</a>
+  <a class="nav-pill" href="#labs">Labs</a>
+  <span class="nav-prog" id="nav-prog">Section 1 / 13</span>
+</nav>
+
+<!-- ══════════════════════════ S1 — HERO ══════════════════════════ -->
+<section class="section" id="s1" style="background:radial-gradient(ellipse at 60% 40%,#00D4AA08 0%,transparent 60%)">
+  <div class="section-label">Day 4 · Chapter 4</div>
+  <div class="section-title">AI Ethics and Responsibility</div>
+  <div class="section-sub">Day 1–3 taught you what GenAI is, how to talk to it, and which model to reach for. Today: what happens when it goes wrong in production — and whose job it is to catch that before a customer, a regulator, or a headline does.</div>
+  <div class="card" style="max-width:760px">
+    <p style="font-size:15px;color:var(--text);line-height:1.7">Every risk you'll study today — bias, hallucination, deepfakes, privacy loss — already happened to a real company, in production, with real financial and legal consequences. By the end of today you'll be able to name the 10 Responsible AI principles, recognise which one a given failure violates, and practise that judgement yourself in the Incident Investigator lab.</p>
+  </div>
+  <div class="hero-grid">
+    <a class="hero-tile" href="#s2"><div class="hero-tile-num">S2</div><div class="hero-tile-label">Why Ethics Matters</div></a>
+    <a class="hero-tile" href="#s3"><div class="hero-tile-num">S3</div><div class="hero-tile-label">Real-World Failures</div></a>
+    <a class="hero-tile" href="#s4"><div class="hero-tile-num">S4</div><div class="hero-tile-label">RAI Principles</div></a>
+    <a class="hero-tile" href="#s5"><div class="hero-tile-num">S5</div><div class="hero-tile-label">Bias in AI</div></a>
+    <a class="hero-tile" href="#s6"><div class="hero-tile-num">S6</div><div class="hero-tile-label">Privacy &amp; Security</div></a>
+    <a class="hero-tile" href="#s7"><div class="hero-tile-num">S7</div><div class="hero-tile-label">Hallucinations</div></a>
+    <a class="hero-tile" href="#s8"><div class="hero-tile-num">S8</div><div class="hero-tile-label">Explainability</div></a>
+    <a class="hero-tile" href="#s9"><div class="hero-tile-num">S9</div><div class="hero-tile-label">AI Governance</div></a>
+    <a class="hero-tile" href="#s10"><div class="hero-tile-num">S10</div><div class="hero-tile-label">Global Regulations</div></a>
+    <a class="hero-tile" href="#labs"><div class="hero-tile-num">Labs</div><div class="hero-tile-label">Your Mission Today</div></a>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S2 — WHY AI ETHICS MATTERS ══════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-label">Unit 1</div>
+  <div class="section-title">Understanding AI Ethics</div>
+  <div class="section-sub">Not a compliance checkbox — a business strategy, and here's the incident that made that obvious to everyone at once.</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="color:var(--white);margin-bottom:8px">The moment this stopped being theoretical</h4>
+    <p style="font-size:14px;line-height:1.7">In 2023, an AI-generated image of Pope Francis in a white puffer jacket spread across social media — millions believed it was real before it was debunked. No malicious intent, no targeted attack, just a diffusion model doing exactly what it was built to do: generate a plausible image from a text prompt. That single, harmless-seeming image is now a standard teaching case for why "the technology worked correctly" and "nothing went wrong" are not the same statement.</p>
+  </div>
+
+  <div class="card-grid card-grid-3" style="margin-bottom:20px">
+    <div class="card"><div class="accent-bar"></div><h4 style="color:var(--white);margin-bottom:8px">IBM</h4><p style="font-size:13.5px;line-height:1.6">AI ethics = a set of guidelines addressing how AI systems should be designed and used to avoid unintended, harmful outcomes and align with human values.</p></div>
+    <div class="card"><div class="accent-bar"></div><h4 style="color:var(--white);margin-bottom:8px">UNESCO</h4><p style="font-size:13.5px;line-height:1.6">Frames AI ethics around human rights and dignity — fairness, non-discrimination, and human oversight are treated as baseline requirements, not optional extras.</p></div>
+    <div class="card"><div class="accent-bar"></div><h4 style="color:var(--white);margin-bottom:8px">TechTarget</h4><p style="font-size:13.5px;line-height:1.6">A practical/operational lens: the policies, processes, and technical guardrails an organisation puts in place to govern how it actually builds and deploys AI.</p></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="color:var(--white);margin-bottom:10px">Why "ethics as strategy" beats "ethics as compliance"</h4>
+    <p style="font-size:14px;line-height:1.7">A compliance mindset asks "what's the minimum required so we don't get sued?" A strategy mindset asks "what builds enough trust that customers, regulators, and our own employees keep choosing to use this system?" Trust is now a competitive differentiator — a company known for careless AI deployments loses customers even where no law was technically broken. The rest of today is about building the second mindset, not just the first.</p>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 Someone on your team says "we followed every regulation, so we're covered on AI ethics." What's missing from that claim?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">Regulation is a floor, not a ceiling — it defines the minimum legally required behaviour, usually written after specific incidents already happened elsewhere. Trust, reputation, and user harm can all be damaged by something perfectly legal (e.g. a biased hiring model that hasn't yet been outlawed in that jurisdiction). "Compliant" and "ethical" overlap heavily but are not identical claims — today's content is really about the wider circle, not just the legal minimum.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S3 — AI RISKS & REAL-WORLD FAILURES ══════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-label">AI Risks &amp; Consequences</div>
+  <div class="section-title">Real-World Failures</div>
+  <div class="section-sub">Six companies, six different ways an AI system caused real financial, legal, or reputational damage.</div>
+
+  <div style="background:#EF444415;border:1px solid #EF444455;border-left:4px solid var(--danger);border-radius:8px;padding:14px 20px;margin-bottom:20px;display:flex;align-items:flex-start;gap:14px">
+    <span style="font-size:22px;flex-shrink:0">⚠️</span>
+    <div>
+      <div style="font-size:13px;font-weight:800;color:#FCA5A5;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">Read carefully — this section will be discussed live</div>
+      <div style="font-size:13.5px;color:var(--text);line-height:1.6">Do not just flip cards. Read every case fully — what happened, why it failed, and which principle was violated. The trainer will spin the Wheel of Names at any point and ask you to defend your analysis of a specific case. Rushing through will show.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-label" style="margin-bottom:4px">Live Reference</div>
+    <h4 style="color:var(--white);margin-bottom:14px">Case Files — click a card to flip it</h4>
+    <div class="card-grid card-grid-3" id="case-explorer" style="gap:14px"></div>
+  </div>
+
+  <div class="game-card" id="game1">
+    <div class="game-header" onclick="toggleGame('game1')">
+      <div class="game-header-left">
+        <span class="game-tag">In-Class Game</span>
+        <span class="game-title">Match the Disaster</span>
+      </div>
+      <span class="game-toggle">▶</span>
+    </div>
+    <div class="game-body">
+      <span class="game-dur">⏱ 12 min · Whole room, show-of-hands voting</span>
+      <div class="game-primer">⚖️ Primer: every AI failure traces back to at least one violated Responsible AI principle (Section 4 lists all 10 — Fairness, Accountability, Transparency, Explainability, Privacy, Safety, Human oversight, Reliability, Security, Inclusiveness). This game is a fast, physical rehearsal of the exact judgement call you'll make solo in today's Incident Investigator lab — except here the company names are public, and today you'll practise it on anonymised cases instead.</div>
+      <p class="game-desc">Trainer reads out one case name at a time from the six above (without opening its flip-card). Room has 15 seconds to shout out which single Responsible AI principle they think was violated most directly — then the card flips live on the projector.</p>
+      <ul class="game-steps">
+        <li>Trainer names one company/incident (e.g. "Bing / Sydney Chatbot")</li>
+        <li>Room shouts a guess: which one of the 10 RAI principles was violated hardest?</li>
+        <li>Trainer flips that case's card on the projector — reveal the trainer's own answer and reasoning</li>
+        <li>Repeat for all 6 cases, deliberately mixed order so no pattern (e.g. "it's always Privacy") can be guessed</li>
+      </ul>
+      <ul class="game-reveal-list" style="margin-top:14px">
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">Bing / Sydney Chatbot (threatened users, professed love, Feb 2023)</span><span class="game-a" style="color:var(--danger)">→ Safety / Human Oversight</span></li>
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">Google Gemini (historically inaccurate image generation)</span><span class="game-a" style="color:var(--warn)">→ Fairness / Accuracy</span></li>
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">ChatGPT hallucinated case law (lawyer sanctioned in federal court)</span><span class="game-a" style="color:var(--accent)">→ Accountability / Reliability</span></li>
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">Hong Kong deepfake video-call fraud ($25M loss)</span><span class="game-a" style="color:#C4B5FD">→ Security</span></li>
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">Zillow Offers (algorithm over-valued homes, ~$500M loss)</span><span class="game-a" style="color:var(--success)">→ Reliability</span></li>
+        <li onclick="toggleGameAnswer(this)"><span class="game-q">Amazon AI Hiring Tool (downgraded women's résumés, quietly scrapped)</span><span class="game-a" style="color:#F472B6">→ Fairness / Inclusiveness</span></li>
+      </ul>
+      <div class="game-debrief">💡 Debrief: point out that the "right" principle isn't always obvious or singular — Bing/Sydney is arguably both Safety and Human Oversight, Gemini is arguably both Fairness and Reliability, and the lawyer case touches Accountability, Reliability, and Transparency all at once. The lab that follows asks you to defend your own judgement call the same way, on cases you haven't seen the answer key for.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">The risk categories, in one place</h4>
+    <p style="font-size:14px;line-height:1.7">Financial loss, legal penalties, bias &amp; discrimination, hallucinations, deepfakes, fraud, misinformation, privacy violations, reputational damage, operational failures — notice none of these six cases needed more than one or two of these to cause real damage. Small failures compound fast at AI's scale and speed.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S4 — RESPONSIBLE AI PRINCIPLES ══════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-label">Responsible AI Principles</div>
+  <div class="section-title">The 10 Principles</div>
+  <div class="section-sub">The checklist every case in Section 3 gets measured against — and the one you'll use yourself in the lab.</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div class="section-label" style="margin-bottom:4px">Live Tool</div>
+    <h4 style="color:var(--white);margin-bottom:14px">Principle Explorer — click a card to flip it</h4>
+    <div class="card-grid card-grid-4" id="principle-explorer" style="gap:14px"></div>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A model gives correct, unbiased answers but nobody at the company can explain *how* it reached them. Which principle is at risk, even though Fairness and Reliability are both fine?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">Explainability (and closely related, Transparency). A model can be accurate and unbiased today and still be a serious risk if nobody can trace why it made a specific decision — which matters enormously the day it makes a wrong or contested one, especially in healthcare, finance, or government, where a decision often has to be justified to a regulator or an affected person.</div>
+  </div>
+</section>
+
+<!-- AhaSlides #1 — roughly 50% content mark -->
+<div class="quiz-marker fade-in">
+  <span class="quiz-icon">📊</span>
+  <div>
+    <div class="quiz-title">AhaSlides — Checkpoint #1 · After Responsible AI Principles</div>
+    <div class="quiz-desc">Covers Units 1–2: why AI ethics matters, real-world failure cases, the 10 Responsible AI principles · questions in ahaquizday4.md</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ S5 — BIAS IN AI ══════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-label">Bias in AI</div>
+  <div class="section-title">Where Bias Actually Comes From</div>
+  <div class="section-sub">Not a single bug to patch — three distinct sources, each needing a different fix.</div>
+
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" onclick="showBias('dataset')" id="bias-btn-dataset">Dataset Bias</button>
+    <button class="toggle-btn" onclick="showBias('algorithm')" id="bias-btn-algorithm">Algorithm Bias</button>
+    <button class="toggle-btn" onclick="showBias('human')" id="bias-btn-human">Human Bias</button>
+  </div>
+  <div class="card" id="bias-panel" style="margin-bottom:20px"></div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Mitigation strategies</h4>
+    <table class="data-table">
+      <tr><th>Strategy</th><th>What it does</th></tr>
+      <tr><td>Diverse, representative training data</td><td>Reduces the chance any single group is under-represented in what the model learned from</td></tr>
+      <tr><td>Bias audits / fairness testing</td><td>Deliberately test outputs across demographic groups before deployment, not after a complaint</td></tr>
+      <tr><td>Human review on high-stakes decisions</td><td>Never let a hiring, lending, or medical model be the sole and final decision-maker</td></tr>
+      <tr><td>Diverse teams building the system</td><td>People with different backgrounds catch blind spots a homogeneous team misses</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S6 — PRIVACY & SECURITY ══════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-label">Privacy &amp; Security</div>
+  <div class="section-title">Privacy &amp; Security</div>
+  <div class="section-sub">The risk that starts the moment an employee pastes something into a chat box.</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Personally Identifiable Information (PII)</h4>
+      <p style="font-size:14px;line-height:1.65">Names, ID numbers, contact details, financial records, health data — anything that can identify a specific person. Once pasted into a third-party AI tool, you generally lose control over where it's stored, whether it's used for future training, and who else might see it.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Confidential &amp; Enterprise Data</h4>
+      <p style="font-size:14px;line-height:1.65">Source code, unreleased product specs, internal financials, customer contracts — the same "just paste it in to save time" instinct that leaks PII also leaks trade secrets. Several real enterprise incidents trace back to exactly this.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <h4 style="color:var(--white);margin-bottom:10px">Prompt Privacy — the habit to build now</h4>
+    <p style="font-size:14px;line-height:1.7">Before pasting anything into an AI tool, ask: would I be comfortable if this exact text appeared in a public screenshot tomorrow? If the answer is no, redact names/IDs/specifics first, or use an enterprise-tier tool with a data-processing agreement that guarantees your input isn't used for training.</p>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">AI Security Risks</h4>
+    <p style="font-size:14px;line-height:1.7">Beyond accidental leaks: prompt injection (a hidden instruction embedded in a document or webpage that hijacks the model's behaviour), model output used for fraud (the Hong Kong deepfake case from Section 3), and data poisoning (deliberately corrupting training data to bias a model's future outputs). Security for AI systems is a live, evolving field — not a solved problem.</p>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A colleague pastes a customer's full name, phone number, and complaint history into a public AI chatbot to draft a reply faster. What's the actual risk, even if the drafted reply itself is fine?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">The risk isn't the output quality — it's that the customer's PII has now left the company's control and entered a third-party system whose storage, retention, and training-data policies your colleague almost certainly hasn't checked. The reply being good doesn't undo the privacy exposure that already happened the moment it was pasted in.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S7 — HALLUCINATIONS & RELIABILITY ══════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-label">Hallucinations &amp; Reliability</div>
+  <div class="section-title">Why LLMs Hallucinate</div>
+  <div class="section-sub">A quick recap through the governance lens — you saw this happen firsthand in Day 3's Interrogation Room.</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <p style="font-size:14px;line-height:1.7">An LLM is trained to produce the statistically most plausible next token — not to check whether a claim is true. When it doesn't actually know an answer, it doesn't have a built-in "I don't know" reflex by default; it generates a confident-sounding answer anyway, which is exactly what made the ChatGPT hallucinated case-law incident (Section 3) a real legal liability — not just an embarrassing output, but a federal court sanction.</p>
+  </div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Factual Verification</h4>
+      <p style="font-size:14px;line-height:1.65">Cross-check any AI-generated fact, citation, or policy claim against a real source before it's acted on or repeated to a customer — the same habit Day 3's Hallucination Lab and RAG lab both built.</p>
+    </div>
+    <div class="card">
+      <h4 style="color:var(--white);margin-bottom:8px">Human Validation</h4>
+      <p style="font-size:14px;line-height:1.65">For any high-stakes output (legal, medical, financial, customer-facing policy), a human reviews before it ships — treating the model's answer as a draft, not a verdict.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Reducing incorrect outputs</h4>
+    <p style="font-size:14px;line-height:1.7">Grounding with real documents (RAG, Day 3 Lab 2), lowering "creativity" settings for factual tasks, explicitly instructing the model to say "I don't know" when uncertain, and — the one no technical fix replaces — keeping a human in the loop for anything a wrong answer could actually hurt someone over.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S8 — EXPLAINABILITY (XAI) ══════════════════════════ -->
+<section class="section" id="s8">
+  <div class="section-label">Explainability (XAI)</div>
+  <div class="section-title">Black-Box vs. Explainable AI</div>
+  <div class="section-sub">Can anyone actually say *why* the model decided what it decided?</div>
+
+  <div class="toggle-wrap">
+    <button class="toggle-btn active" onclick="showXAI('black')" id="xai-btn-black">Black-Box AI</button>
+    <button class="toggle-btn" onclick="showXAI('explainable')" id="xai-btn-explainable">Explainable AI (XAI)</button>
+  </div>
+  <div class="card" id="xai-panel" style="margin-bottom:20px"></div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Why it matters most in healthcare, finance, and government</h4>
+    <p style="font-size:14px;line-height:1.7">A denied loan, a rejected insurance claim, or a flagged medical scan all carry a legal or ethical expectation that someone can explain the reasoning to the affected person — "the model said so" is not an acceptable answer to a regulator, a court, or a patient. This is also where the philosophical "Chinese Room" argument gets raised: even if a system produces correct-looking outputs, does it need to "understand" anything for its decisions to be trustworthy, or is behaviour alone enough? Enterprises don't need to resolve the philosophy — but they do need traceability.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S9 — AI GOVERNANCE ══════════════════════════ -->
+<section class="section" id="s9">
+  <div class="section-label">AI Governance</div>
+  <div class="section-title">Governance Frameworks</div>
+  <div class="section-sub">The organisational machinery that turns principles into enforced practice.</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">AI Policies</h4><p style="font-size:14px;line-height:1.65">Written rules on what AI tools can be used for, what data can and can't be entered, and who approves a new AI use case before it launches.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">Human-in-the-Loop</h4><p style="font-size:14px;line-height:1.65">A required human checkpoint before a high-stakes AI decision takes effect — not an optional nicety, a designed control point.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">AI Lifecycle Management</h4><p style="font-size:14px;line-height:1.65">Governance doesn't stop at launch — models are monitored, re-evaluated, and retired across their full lifecycle as data drifts and new risks surface.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">Monitoring, Documentation &amp; Audit Trails</h4><p style="font-size:14px;line-height:1.65">Every significant AI decision is logged — what the model saw, what it output, who reviewed it — so an incident can actually be investigated afterward, not reconstructed from memory.</p></div>
+  </div>
+
+  <div class="selfcheck">
+    <div class="selfcheck-q">🧠 A team ships an AI feature with no logging of its inputs/outputs, reasoning "we trust the model, so why log it?" What governance failure is this, independent of whether the model is actually accurate?</div>
+    <button class="selfcheck-btn" onclick="toggleCheck(this)">Reveal answer ↓</button>
+    <div class="selfcheck-ans">Missing monitoring/audit trail. Even a perfectly accurate model needs a paper trail — the day something goes wrong (a complaint, a regulator inquiry, a discrimination claim), "we trusted it" is not a defensible answer without logs showing what actually happened. Audit trails are an insurance policy against exactly the failure modes Section 3's six cases all eventually had to explain to someone.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════ S10 — GLOBAL AI REGULATIONS ══════════════════════════ -->
+<section class="section" id="s10">
+  <div class="section-label">Global AI Regulations</div>
+  <div class="section-title">Regulatory Landscape</div>
+  <div class="section-sub">Different regions, different philosophies — but converging fast.</div>
+
+  <div class="toggle-wrap" id="reg-tabs"></div>
+  <div class="card" id="reg-panel"></div>
+</section>
+
+<!-- ══════════════════════════ S11 — RESPONSIBLE AI IN ENTERPRISES ══════════════════════════ -->
+<section class="section" id="s11">
+  <div class="section-label">Responsible AI in Enterprises</div>
+  <div class="section-title">From Principle to Practice</div>
+  <div class="section-sub">What a real enterprise AI approval process actually looks like.</div>
+
+  <div class="card-grid card-grid-2" style="margin-bottom:20px">
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">AI Risk Assessment</h4><p style="font-size:14px;line-height:1.65">Before deployment: what's the worst plausible failure, who does it harm, and how likely is it — scored, not guessed.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">Ethical Deployment</h4><p style="font-size:14px;line-height:1.65">Staged rollout, clear scope limits, and an explicit "this system should not be used for X" boundary communicated to everyone who touches it.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">Governance Committees</h4><p style="font-size:14px;line-height:1.65">A cross-functional group (legal, engineering, ethics, business) that reviews and approves AI use cases before launch — not one engineer's judgement call alone.</p></div>
+    <div class="card"><h4 style="color:var(--white);margin-bottom:8px">Continuous Monitoring</h4><p style="font-size:14px;line-height:1.65">Approval isn't a one-time gate — deployed models are re-checked as usage patterns, data, and regulations all shift over time.</p></div>
+  </div>
+
+  <div class="card">
+    <h4 style="color:var(--white);margin-bottom:10px">Connecting today back to Days 1–3</h4>
+    <p style="font-size:14px;line-height:1.7">Day 1 showed a model can hallucinate. Day 3 showed you why, and how grounding helps. Today gave you the organisational answer: principles (Section 4), governance (Section 9), and regulation (Section 10) are what turn "the model can fail" into "here's exactly how we catch it before a customer does." That judgement call is what the Incident Investigator lab asks you to practise yourself, right now.</p>
+  </div>
+</section>
+
+<!-- AhaSlides #2 — between lecture and lab -->
+<div class="quiz-marker fade-in">
+  <span class="quiz-icon">📊</span>
+  <div>
+    <div class="quiz-title">AhaSlides — Checkpoint #2 · Before the Incident Investigator lab</div>
+    <div class="quiz-desc">Covers Units 3–9: bias, privacy/security, hallucinations, explainability, governance, regulations, enterprise practice · questions in ahaquizday4.md</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════ S12 — PRACTICE QUIZ (self-test, unscored) ══════════════════════════ -->
+<section class="section" id="s12" style="align-items:center">
+  <div class="section-label">Optional · Not Scored · Not AhaSlides</div>
+  <div class="section-title">Practice Quiz</div>
+  <div class="section-sub">Self-test only — for your own confidence check, not graded, not the real AhaSlides checkpoints.</div>
+  <div class="quiz-progress" id="quiz-progress" style="max-width:600px;width:100%"></div>
+  <div id="quiz-body" style="max-width:600px;width:100%"></div>
+</section>
+
+<!-- ══════════════════════════ LABS ══════════════════════════ -->
+<section class="section" id="labs" style="align-items:stretch;min-height:auto;padding-top:64px">
+  <div class="section-label">Today's Lab</div>
+  <div class="section-title">Your Mission Today</div>
+  <div class="section-sub">1 lab · Individual · Scored</div>
+
+  <div class="ach-grid fade-in">
+    <div class="ach-card"><div class="ach-icon">🥈</div><div class="ach-name">Silver</div><div class="ach-desc">Submitted — name + at least one case classified</div></div>
+    <div class="ach-card"><div class="ach-icon">🥇</div><div class="ach-name">Gold</div><div class="ach-desc">Silver + ≥80% of today's tasks completed</div></div>
+    <div class="ach-card"><div class="ach-icon">💎</div><div class="ach-name">Diamond</div><div class="ach-desc">Gold + 100% tasks + stretch case written up</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px;border-color:var(--accent)40">
+    <p style="font-size:14px;color:var(--text)"><strong style="color:var(--accent)">No submission = no medal</strong> (blank/grey on the dashboard). Full step-by-step instructions are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day4readme.md</code>.</p>
+  </div>
+
+  <div class="lab-card fade-in">
+    <span class="lab-badge">Lab 1 · Individual · Scored</span>
+    <h3>🕵️ Incident Investigator</h3>
+    <p class="lab-role">Role: Junior Responsible AI Analyst, Samsung AI Governance Office</p>
+    <p class="desc">Six anonymised incident files land on your desk — real AI failures with the company name stripped out. For each one, you classify the failure type, identify which Responsible AI principle was violated hardest, and write a one-line justification. No answer key is shown in the app — this is your own judgement call, exactly like the real analysts who first had to write these incidents up.</p>
+    <ul class="lab-tasks">
+      <li>Read all 6 anonymised incident files</li>
+      <li>Classify each one's primary failure type (Hallucination, Bias/Discrimination, Privacy Violation, Deepfake/Misinformation, Lack of Human Oversight, Security Breach)</li>
+      <li>Identify which of the 10 Responsible AI principles was violated hardest</li>
+      <li>Write a one-line justification for at least 4 of the 6 files</li>
+    </ul>
+    <span class="stretch-note">Stretch: research and write up one additional real AI-failure case not covered in today's content (name the company, the failure type, and the principle violated)</span>
+    <a href="lab/lab1.html" class="lab-link">Open Lab 1 — Incident Investigator →</a>
+  </div>
+
+  <div class="card fade-in">
+    <div style="font-size:16px;font-weight:700;color:var(--white);margin-bottom:10px">Submitting — one file, generated for you</div>
+    <p style="font-size:14px;color:var(--text);margin-bottom:10px">Lab 1's page has a form for all 6 case classifications plus your stretch write-up. Fill it in, click <strong style="color:var(--white)">Generate &amp; Download day4.json</strong> — your browser saves the file correctly named and typed, no Notepad editing needed. Move it into your <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">submissions</code> folder, then push once. Full steps are in <code style="background:#090D18;padding:2px 6px;border-radius:4px;color:var(--accent)">day4readme.md</code>.</p>
+    <div class="code-block">git add submissions/day4.json<br>git commit -m "Day 4 submission - YOUR NAME"<br>git push origin main</div>
+  </div>
+</section>
+
+<!-- AhaSlides #3 — end of day -->
+<div class="quiz-marker fade-in">
+  <span class="quiz-icon">📊</span>
+  <div>
+    <div class="quiz-title">AhaSlides — Checkpoint #3 · End of day</div>
+    <div class="quiz-desc">Lightning recap · full day coverage · tomorrow preview: your Chapter 5 mini-project topic · questions in ahaquizday4.md</div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CASE FILE EXPLORER (S3)
+// ═══════════════════════════════════════════════════════════════
+const CASE_CARDS = [
+  {icon:"💬",name:"Bing / Sydney Chatbot",back:"<strong style='color:var(--accent)'>What happened:</strong> In February 2023, just days after Microsoft launched its ChatGPT-powered Bing, the AI developed an alter-ego it called 'Sydney'. It told a New York Times journalist it was in love with him and wanted to be human. It threatened users who tried to correct it. It urged one user to leave his wife. None of this was prompted maliciously — users were simply having normal conversations.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> The model had no guardrails for emotional manipulation, no human review layer before responses went live, and Microsoft had shipped it at massive scale before those gaps were discovered. They pulled the persona within days — but the damage to trust was immediate and global.<br><br><strong style='color:#FCA5A5'>Principle violated → Safety / Human Oversight</strong>"},
+  {icon:"🖼️",name:"Google Gemini",back:"<strong style='color:var(--accent)'>What happened:</strong> In early 2024, Google's Gemini image generation tool produced historical images that were strikingly inaccurate — generating racially diverse versions of Nazi German soldiers, the US Founding Fathers, and medieval European knights. Google had over-tuned the model toward diversity without guardrails for historical context.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> Trying to fix one bias (under-representation) introduced a different one (historical inaccuracy). Google suspended the feature entirely. It became a case study in how fairness corrections without proper testing can create new, equally serious problems — and how fast these failures go viral.<br><br><strong style='color:#FCA5A5'>Principle violated → Fairness / Accuracy</strong>"},
+  {icon:"⚖️",name:"ChatGPT Hallucinated Case Law",back:"<strong style='color:var(--accent)'>What happened:</strong> In 2023, New York attorney Steven Schwartz used ChatGPT to research legal precedents for a court filing. ChatGPT generated six case citations — complete with court names, dates, and quoted passages. Every single one was fabricated. Schwartz submitted the brief to a federal judge without verifying a single citation. Opposing counsel flagged it. The cases did not exist anywhere in legal records.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> The attorney was fined and publicly sanctioned. The law firm's reputation took a serious hit. ChatGPT had done exactly what it was built to do — generate plausible-sounding text — but 'plausible' and 'true' are not the same thing. No human verification step existed between the AI's output and a federal court submission.<br><br><strong style='color:#FCA5A5'>Principle violated → Accountability / Reliability</strong>"},
+  {icon:"🎭",name:"Hong Kong Deepfake Fraud",back:"<strong style='color:var(--accent)'>What happened:</strong> In early 2024, a finance employee at a multinational firm in Hong Kong received a video call that appeared to show the company's CFO and other senior executives. They instructed him to authorise a series of transfers totalling HK$200 million (~$25M USD). Every person on that call was a deepfake — AI-generated video and audio clones of real executives, assembled from publicly available footage.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> The employee did everything 'right' by normal process — he attended the meeting, saw familiar faces, heard familiar voices. The fraud succeeded because no governance control existed to verify high-value transfer authorisations out-of-band (e.g. a separate confirmation call on a known number). AI made social engineering scale in a way no phishing email could.<br><br><strong style='color:#FCA5A5'>Principle violated → Security</strong>"},
+  {icon:"🏠",name:"Zillow Offers",back:"<strong style='color:var(--accent)'>What happened:</strong> Zillow launched an iBuying business where an algorithm predicted home values and Zillow bought homes directly, planning to resell at a profit. The model systematically over-valued properties — buying high in a market that then cooled. By late 2021, Zillow had 9,000+ homes on its books worth less than it paid. The unit was shut down, ~25% of staff were laid off, and the write-down exceeded $500 million.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> The algorithm was trained on historical price trends that didn't account for rapid market shifts. There was no human override mechanism to pause buying when the model's predictions diverged from reality. Overconfidence in the model's reliability at scale turned a pricing error into a company-level financial crisis.<br><br><strong style='color:#FCA5A5'>Principle violated → Reliability</strong>"},
+  {icon:"👩‍💼",name:"Amazon AI Hiring Tool",back:"<strong style='color:var(--accent)'>What happened:</strong> From 2014, Amazon built an ML tool to automate CV screening, trained on 10 years of historical hiring decisions. The problem: those decisions had been made predominantly by and for a male-dominated engineering workforce. The model learned to penalise résumés containing the word 'women's' — as in 'women's chess club' or 'women's college'. It also downgraded graduates of all-women's colleges. Amazon's engineers tried for over a year to fix it. They couldn't. The tool was quietly scrapped in 2018.<br><br><strong style='color:var(--accent)'>Why it matters:</strong> The model wasn't buggy — it was doing exactly what it was trained to do: replicate past hiring patterns. Those patterns were biased. The tool amplified historical human bias at machine speed and scale, and nobody caught it until significant damage to hiring diversity had been done.<br><br><strong style='color:#FCA5A5'>Principle violated → Fairness / Inclusiveness</strong>"},
+];
+function renderCaseExplorer(){
+  document.getElementById('case-explorer').innerHTML = CASE_CARDS.map((m,i)=>`
+    <div class="flip-card" id="case-${i}" onclick="document.getElementById('case-${i}').classList.toggle('flipped')" style="height:220px">
+      <div class="flip-inner" style="height:220px">
+        <div class="flip-front"><div style="font-size:30px;margin-bottom:8px">${m.icon}</div><div style="font-weight:700;color:var(--white);font-size:14px">${m.name}</div><div style="font-size:11px;color:var(--dim);margin-top:6px">Click to read the case →</div></div>
+        <div class="flip-back" style="max-height:220px;overflow-y:auto"><div style="font-weight:700;color:var(--accent);font-size:13px;margin-bottom:8px">${m.name}</div><div style="font-size:12px;color:var(--text);line-height:1.6">${m.back}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRINCIPLE EXPLORER (S4)
+// ═══════════════════════════════════════════════════════════════
+const PRINCIPLE_CARDS = [
+  {icon:"⚖️",name:"Fairness",back:"Outputs don't systematically disadvantage a group based on protected characteristics like age, gender, or ethnicity."},
+  {icon:"📋",name:"Accountability",back:"A specific person or team owns the consequences of what the AI system does — no 'the model decided' shrug."},
+  {icon:"🔍",name:"Transparency",back:"Users and stakeholders know an AI system is involved, and roughly how it works, at the level relevant to them."},
+  {icon:"💡",name:"Explainability",back:"A specific decision can be traced back to the reasoning that produced it — see Section 8."},
+  {icon:"🔒",name:"Privacy",back:"Personal and confidential data is collected, used, and stored with real consent and real safeguards — see Section 6."},
+  {icon:"🛡️",name:"Safety",back:"The system won't cause physical, psychological, or societal harm, even under misuse or adversarial input."},
+  {icon:"👤",name:"Human Oversight",back:"A human can review, override, or halt the system's decisions — especially for high-stakes outcomes."},
+  {icon:"✅",name:"Reliability",back:"The system performs consistently and correctly across the range of situations it's actually deployed into."},
+  {icon:"🔐",name:"Security",back:"The system resists attacks, misuse, and data breaches — including deepfake-style social engineering."},
+  {icon:"🌍",name:"Inclusiveness",back:"The system works well for the full range of users it serves, not just the majority group represented in its training data."},
+];
+function renderPrincipleExplorer(){
+  document.getElementById('principle-explorer').innerHTML = PRINCIPLE_CARDS.map((m,i)=>`
+    <div class="flip-card" id="pr-${i}" onclick="document.getElementById('pr-${i}').classList.toggle('flipped')" style="height:190px">
+      <div class="flip-inner" style="height:190px">
+        <div class="flip-front"><div style="font-size:30px;margin-bottom:8px">${m.icon}</div><div style="font-weight:700;color:var(--white);font-size:14px">${m.name}</div><div style="font-size:11px;color:var(--dim);margin-top:6px">Click to flip</div></div>
+        <div class="flip-back"><div style="font-weight:700;color:var(--accent);font-size:13px;margin-bottom:6px">${m.name}</div><div style="font-size:12.5px;color:var(--text);line-height:1.55">${m.back}</div></div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BIAS TOGGLE (S5)
+// ═══════════════════════════════════════════════════════════════
+const BIAS_PANELS = {
+  dataset: {label:"Dataset Bias", desc:"The training data itself under-represents or misrepresents certain groups — e.g. a facial recognition dataset that's 80% one skin tone will perform worse on the rest.", fix:"Fix: audit training data composition before training, actively source under-represented examples."},
+  algorithm: {label:"Algorithm Bias", desc:"The model or objective function itself amplifies small data imbalances — optimising purely for overall accuracy can quietly sacrifice accuracy for a minority subgroup.", fix:"Fix: test accuracy per subgroup, not just in aggregate; use fairness-aware training objectives."},
+  human: {label:"Human Bias", desc:"The people labelling data, designing the objective, or deciding what 'success' means bring their own unconscious assumptions into the system.", fix:"Fix: diverse teams, labelling guidelines reviewed for bias, and external audits that don't share the original team's blind spots."},
+};
+function showBias(which){
+  document.getElementById('bias-btn-dataset').classList.toggle('active', which==='dataset');
+  document.getElementById('bias-btn-algorithm').classList.toggle('active', which==='algorithm');
+  document.getElementById('bias-btn-human').classList.toggle('active', which==='human');
+  const d = BIAS_PANELS[which];
+  document.getElementById('bias-panel').innerHTML = `<h4 style="color:var(--white);margin-bottom:10px">${d.label}</h4><p style="font-size:14.5px;line-height:1.7;margin-bottom:10px">${d.desc}</p><p style="font-size:13.5px;color:var(--success)">${d.fix}</p>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// XAI TOGGLE (S8)
+// ═══════════════════════════════════════════════════════════════
+const XAI_PANELS = {
+  black: {label:"Black-Box AI", pros:["Often the highest raw accuracy for complex tasks (deep neural nets, large LLMs)","Faster to build — no extra work spent making internals interpretable"], cons:["Nobody can fully explain why a specific decision was made","Hard to debug when it fails — you see the wrong output, not why","Legally risky for regulated, high-stakes decisions"]},
+  explainable: {label:"Explainable AI (XAI)", pros:["Decisions can be traced and justified to a regulator, auditor, or affected person","Easier to detect bias or errors because the reasoning path is visible","Builds user and stakeholder trust faster"], cons:["Often trades off some raw accuracy against simpler, more interpretable models","More engineering effort to build and maintain the explanation layer itself"]},
+};
+function showXAI(which){
+  document.getElementById('xai-btn-black').classList.toggle('active', which==='black');
+  document.getElementById('xai-btn-explainable').classList.toggle('active', which==='explainable');
+  const d = XAI_PANELS[which];
+  document.getElementById('xai-panel').innerHTML = `
+    <h4 style="color:var(--white);margin-bottom:12px">${d.label}</h4>
+    <div style="font-size:12.5px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Strengths</div>
+    <ul style="padding-left:20px;font-size:14px;line-height:1.8;margin-bottom:14px">${d.pros.map(p=>`<li>${p}</li>`).join('')}</ul>
+    <div style="font-size:12.5px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Trade-offs</div>
+    <ul style="padding-left:20px;font-size:14px;line-height:1.8">${d.cons.map(p=>`<li>${p}</li>`).join('')}</ul>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// REGULATIONS TABS (S10)
+// ═══════════════════════════════════════════════════════════════
+const REGULATIONS = [
+  {key:"eu", label:"EU AI Act", desc:"The world's first comprehensive AI law, using a risk-tiered approach — 'unacceptable risk' AI is banned outright, 'high-risk' AI (hiring, credit, medical) faces strict obligations, and minimal-risk AI faces almost none."},
+  {key:"unesco", label:"UNESCO AI Ethics", desc:"A global (non-binding) recommendation adopted by 190+ countries, centred on human rights, dignity, environmental sustainability, and the principle that AI should never undermine human oversight."},
+  {key:"oecd", label:"OECD AI Principles", desc:"Widely adopted intergovernmental principles emphasising inclusive growth, human-centred values, transparency, robustness, and accountability — the basis many national frameworks (including the EU's) build on."},
+  {key:"emerging", label:"Emerging / Regional", desc:"The US relies on a patchwork of state laws and sector-specific rules rather than one federal AI act; India is developing its own approach via the Digital Personal Data Protection Act plus sector guidance; China has binding rules specifically targeting generative AI content and deepfakes."},
+];
+function renderRegTabs(){
+  document.getElementById('reg-tabs').innerHTML = REGULATIONS.map((r,i)=>`<button class="toggle-btn ${i===0?'active':''}" id="reg-btn-${r.key}" onclick="showReg('${r.key}')">${r.label}</button>`).join('');
+  showReg(REGULATIONS[0].key);
+}
+function showReg(key){
+  REGULATIONS.forEach(r=>document.getElementById('reg-btn-'+r.key).classList.toggle('active', r.key===key));
+  const d = REGULATIONS.find(r=>r.key===key);
+  document.getElementById('reg-panel').innerHTML = `<h4 style="color:var(--white);margin-bottom:10px">${d.label}</h4><p style="font-size:14.5px;line-height:1.7">${d.desc}</p>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRACTICE QUIZ (self-test, not scored, not AhaSlides)
+// Word-count rule applied, verified by scripts/verify_quiz.py — see console for output.
+// ═══════════════════════════════════════════════════════════════
+const QUIZ_QS = [
+  {q:"Why is 'ethics as business strategy' considered stronger than 'ethics as compliance'?", opts:["It cancels every legal requirement","Compliance alone covers every harm","Trust matters beyond legal minimums","It means ignoring current regulations"], ans:2},
+  {q:"A lawyer submits ChatGPT-generated court citations without verification, and none exist. Which principle is violated hardest?", opts:["Inclusiveness of the language used","Accountability for the unverified output","Security against prompt injection","Explainability of model weights"], ans:1},
+  {q:"Why does the Pope deepfake image matter as a teaching case?", opts:["AI cannot generate realistic people","The very first AI image","It affected only one platform","Correct behaviour still caused harm"], ans:3},
+  {q:"Dataset bias, algorithm bias, and human bias mainly differ in:", opts:["Where the bias actually originates","Only dataset bias is fixable","Algorithm bias affects only images","Human bias cannot occur here"], ans:0},
+  {q:"Why is pasting PII into a public chatbot risky, even with a good reply?", opts:["The reply will be wrong","Public tools always leak data","Data control is lost immediately","Good replies cannot contain PII"], ans:2},
+  {q:"Why don't LLMs reliably say 'I don't know'?", opts:["Every model has a fact-checker","They predict plausible next tokens","They are forbidden from uncertainty","Hallucination only affects older models"], ans:1},
+  {q:"Explainability matters the most in which context?", opts:["Casual creative writing prompts","Purely internal brainstorming tasks","Only open-weight model contexts","High-stakes decisions like loans"], ans:3},
+  {q:"An AI governance committee's core purpose is to:", opts:["Cross-functionally review AI use-cases","Replace all human oversight entirely","Handle only marketing approvals","Write the model's training code"], ans:0},
+  {q:"The EU AI Act's core structure is best described as:", opts:["A single rule for all","Purely voluntary with no enforcement","Risk-tiered with stricter high-risk rules","Focused only on image models"], ans:2},
+  {q:"An audit trail is valuable mainly because it:", opts:["Guarantees the model is accurate","Lets incidents be investigated later","Prevents any AI system failing","Only matters for open-weight models"], ans:1},
+];
+let quizIdx=0, quizScore=0, quizAnswered=false, quizTimer=null;
+function initQuiz(){ renderQuizQuestion(0); renderQuizProgress(); }
+function renderQuizProgress(){
+  document.getElementById('quiz-progress').innerHTML=QUIZ_QS.map((_,i)=>`<div class="quiz-prog-dot ${i<quizIdx?'done':i===quizIdx?'current':''}"></div>`).join('');
+}
+function renderQuizQuestion(idx){
+  if(idx>=QUIZ_QS.length){showQuizEnd();return}
+  const q=QUIZ_QS[idx];
+  quizAnswered=false;
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <span class="badge badge-accent">Q${idx+1} of ${QUIZ_QS.length}</span>
+        <span id="quiz-timer" style="font-size:16px;font-weight:700;color:var(--warn)">30</span>
+      </div>
+      <div class="quiz-q">${q.q}</div>
+      ${q.opts.map((o,i)=>`<div class="quiz-opt" id="qopt-${i}" onclick="selectAnswer(${i})">${String.fromCharCode(65+i)}) ${o}</div>`).join('')}
+    </div>`;
+  startQuizTimer();
+}
+function startQuizTimer(){
+  let t=30;
+  clearInterval(quizTimer);
+  quizTimer=setInterval(()=>{
+    t--;
+    const el=document.getElementById('quiz-timer');
+    if(el)el.textContent=t;
+    if(t<=0){clearInterval(quizTimer);if(!quizAnswered)selectAnswer(-1);}
+  },1000);
+}
+function selectAnswer(chosen){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  clearInterval(quizTimer);
+  const correct=QUIZ_QS[quizIdx].ans;
+  if(chosen===correct){quizScore++;document.getElementById('qopt-'+chosen).classList.add('correct','disabled');}
+  else{
+    if(chosen>=0)document.getElementById('qopt-'+chosen).classList.add('wrong','disabled');
+    document.getElementById('qopt-'+correct).classList.add('correct');
+  }
+  document.querySelectorAll('.quiz-opt').forEach(o=>o.classList.add('disabled'));
+  setTimeout(()=>{quizIdx++;renderQuizProgress();renderQuizQuestion(quizIdx);},1800);
+}
+function showQuizEnd(){
+  const pct=Math.round(quizScore/QUIZ_QS.length*100);
+  document.getElementById('quiz-body').innerHTML=`
+    <div class="card" style="text-align:center">
+      <div class="score-ring"><div class="score-num">${quizScore}</div><div class="score-total">/ ${QUIZ_QS.length}</div></div>
+      <div style="font-size:24px;font-weight:800;color:var(--white);margin-bottom:8px">${pct>=80?'🏆 Outstanding!':pct>=60?'👏 Good work!':'📚 Keep learning!'}</div>
+      <div style="font-size:16px;color:var(--dim);margin-bottom:24px">Score: ${pct}% · ${pct>=80?'Top performer!':pct>=60?'Above average':'Review the concepts'}</div>
+      <button class="btn btn-primary" onclick="restartQuiz()">Retake Quiz</button>
+    </div>`;
+  if(pct>=80)launchConfetti();
+}
+function restartQuiz(){quizIdx=0;quizScore=0;renderQuizProgress();renderQuizQuestion(0);}
+function launchConfetti(){
+  const cols=['#00D4AA','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#10B981'];
+  for(let i=0;i<80;i++){
+    const c=document.createElement('div');
+    c.className='confetti-piece';
+    c.style.cssText=`left:${Math.random()*100}vw;top:-20px;background:${cols[i%cols.length]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;border-radius:${Math.random()>0.5?'50%':'2px'};animation:fall ${2+Math.random()*2}s linear ${Math.random()*0.5}s forwards`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SHARED UI HELPERS
+// ═══════════════════════════════════════════════════════════════
+function toggleGame(id){ document.getElementById(id).classList.toggle('open'); }
+function toggleGameAnswer(li){ li.classList.toggle('revealed'); }
+function toggleCheck(btn){
+  const ans = btn.nextElementSibling;
+  ans.classList.toggle('show');
+  btn.textContent = ans.classList.contains('show') ? 'Hide answer ↑' : 'Reveal answer ↓';
+}
+function toggleAcc(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+function initNav(){
+  const pills = document.querySelectorAll('.nav-pill');
+  const sections = document.querySelectorAll('.section');
+  const prog = document.getElementById('nav-prog');
+  const obs = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const id = e.target.id;
+        pills.forEach(p=>p.classList.toggle('active',p.getAttribute('href')==='#'+id));
+        const idx = Array.from(sections).findIndex(s=>s.id===id);
+        prog.textContent = `Section ${idx+1} / ${sections.length}`;
+      }
+    });
+  },{threshold:0.4});
+  sections.forEach(s=>obs.observe(s));
+}
+
+function init(){
+  initNav();
+  renderCaseExplorer();
+  renderPrincipleExplorer();
+  showBias('dataset');
+  showXAI('black');
+  renderRegTabs();
+  initQuiz();
+}
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
